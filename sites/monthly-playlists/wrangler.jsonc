@@ -1,0 +1,17 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "monthly-playlists",
+    "compatibility_date": "2026-10-03",
+    "build": {
+        "command": "npm run build",
+    },
+    "assets": {
+        "directory": "./dist",
+    },
+    "routes": [
+        {
+            "pattern": "playlists.badrchoubai.dev",
+            "custom_domain": true,
+        },
+    ],
+}

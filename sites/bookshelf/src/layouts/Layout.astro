@@ -1,0 +1,36 @@
+---
+import Header from "@badrchoubai/ui/Header.astro";
+import Footer from "@badrchoubai/ui/Footer.astro";
+import "@badrchoubai/ui/styles/base.css";
+import { ClientRouter } from "astro:transitions";
+
+import Head from "../components/Head.astro";
+const { title, description, image, noindex } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <Head {title} {description} {image} {noindex}>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <ClientRouter />
+  </Head>
+
+  <body>
+    <a href="#content" class="btn primary sm sr-only skip-link"
+      >Skip to main content</a
+    >
+    <Header title="Bookshelf" />
+    <main class="main" id="content">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .main {
+    border-top: var(--app-border-width) solid var(--app-border-color);
+    border-bottom: var(--app-border-width) solid var(--app-border-color);
+  }
+</style>

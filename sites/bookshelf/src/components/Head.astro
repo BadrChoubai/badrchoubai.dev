@@ -1,0 +1,74 @@
+---
+import { getImage } from "astro:assets";
+import defaultOgImage from "../assets/images/geisel.jpg";
+
+/**
+ * Props:
+ * - title: string
+ * - description?: string
+ * - image?: string (og)
+ * - noindex?: boolean
+ */
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+}
+let {
+  title = "Badr Choubai",
+  description,
+  image,
+  noindex = false,
+} = Astro.props;
+
+if (description) {
+  title = `${title} | ${description}`;
+}
+
+// Social card: 1200x630 crop of the hero image unless a page passes its own
+const ogImageSrc =
+  image ??
+  (
+    await getImage({
+      src: defaultOgImage,
+      width: 1200,
+      height: 630,
+      fit: "cover",
+      format: "jpg",
+      quality: 80,
+    })
+  ).src;
+const ogImage = new URL(ogImageSrc, Astro.site).href;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!-- Page title -->
+<title>{title}</title>
+<!-- Slot for extra tags -->
+<slot />
+
+<!-- Metadata -->
+{description && <meta name="description" content={description} />}
+<link rel="canonical" href={canonicalUrl} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+
+<!-- Icons -->
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#222222" />
+
+<!-- OpenGraph -->
+<meta property="og:title" content={title} />
+{description && <meta property="og:description" content={description} />}
+<meta property="og:image" content={ogImage} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:type" content="website" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+{description && <meta name="twitter:description" content={description} />}
+<meta name="twitter:image" content={ogImage} />

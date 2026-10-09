@@ -1,0 +1,205 @@
+---
+interface Props {
+  shelves: { genre: string; id: string }[];
+}
+
+const { shelves } = Astro.props;
+---
+
+<!-- Placeholder keeps the bar's space in the flow while it's docked -->
+<div class="genre-nav" data-genre-nav>
+  <nav class="genre-nav__bar" aria-label="Genres">
+    <ul>
+      {
+        shelves.map(({ genre, id }) => (
+          <li>
+            <a href={`#${id}`}>{genre}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<script>
+  /**
+   * Desktop: the bar sticks to the top of the viewport (plain CSS sticky).
+   * Mobile: once it scrolls out the top it docks to the bottom, and undocks
+   * when scrolled back up. CSS sticky can only pin to the edge it's leaving,
+   * hence the observer.
+   */
+  function initGenreNav() {
+    const slot = document.querySelector<HTMLElement>("[data-genre-nav]");
+    const bar = slot?.querySelector<HTMLElement>(".genre-nav__bar");
+    if (!slot || !bar) return;
+
+    const root = document.documentElement;
+    const mobile = window.matchMedia("(max-width: 749px)");
+    let scrolledPast = false;
+
+    const update = () => {
+      const docked = mobile.matches && scrolledPast;
+      // Measure in-flow height before docking changes the bar's padding
+      slot.style.height = docked ? `${bar.offsetHeight}px` : "";
+      bar.classList.toggle("is-docked", docked);
+      root.classList.toggle("genre-nav-docked", docked);
+      root.style.setProperty("--genre-nav-height", `${bar.offsetHeight}px`);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      update();
+    });
+
+    observer.observe(slot);
+    mobile.addEventListener("change", update);
+
+    // Current genre: whichever shelf crosses the middle of the viewport
+    const list = bar.querySelector<HTMLElement>("ul")!;
+    const links = new Map<Element, HTMLAnchorElement>();
+    for (const link of bar.querySelectorAll<HTMLAnchorElement>("a")) {
+      const shelf = document
+        .getElementById(link.hash.slice(1))
+        ?.closest("section");
+      if (shelf) links.set(shelf, link);
+    }
+    const smooth = window.matchMedia("(prefers-reduced-motion: no-preference)");
+
+    const select = (current?: HTMLAnchorElement) => {
+      for (const link of links.values()) {
+        if (link === current) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      }
+      // On mobile the row scrolls sideways; bring the current genre to centre
+      if (current && mobile.matches) {
+        list.scrollTo({
+          left:
+            current.offsetLeft - (list.clientWidth - current.offsetWidth) / 2,
+          behavior: smooth.matches ? "smooth" : "auto",
+        });
+      }
+    };
+
+    let active: HTMLAnchorElement | undefined;
+    const shelfObserver = new IntersectionObserver(
+      (entries) => {
+        for (const { target, isIntersecting } of entries) {
+          const link = links.get(target);
+          if (isIntersecting) active = link;
+          else if (active === link) active = undefined;
+        }
+        select(active);
+      },
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    for (const shelf of links.keys()) shelfObserver.observe(shelf);
+
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        observer.disconnect();
+        shelfObserver.disconnect();
+        mobile.removeEventListener("change", update);
+        root.classList.remove("genre-nav-docked");
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener("astro:page-load", initGenreNav);
+</script>
+
+<style>
+  .genre-nav__bar {
+    padding-inline: 0;
+    background-color: var(--app-background-color);
+    border-block: 1px solid var(--app-border-color);
+  }
+
+  /* One row; scrolls sideways instead of wrapping if it runs out of room */
+  .genre-nav__bar ul {
+    position: relative; /* offsetParent for centring the current link */
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .genre-nav__bar li {
+    flex: none;
+  }
+
+  .genre-nav__bar a {
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .genre-nav__bar a:hover,
+  .genre-nav__bar a:focus-visible {
+    color: var(--app-accent-color--hover);
+  }
+
+  .genre-nav__bar a[aria-current] {
+    color: var(--app-accent-color);
+  }
+
+  .genre-nav__bar a:focus-visible {
+    outline: 2px solid var(--app-accent-color);
+    outline-offset: 3px;
+  }
+
+  /* Desktop: stick to the top for the length of the shelf */
+  @media (min-width: 750px) {
+    .genre-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    /* Keep jumped-to genre headings clear of the stuck bar */
+    :global(html) {
+      scroll-padding-top: var(--genre-nav-height, 0);
+    }
+  }
+
+  /* Mobile, docked: pinned to the viewport bottom */
+  .genre-nav__bar.is-docked {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 10;
+    padding-inline: var(--app-spacing);
+    background-color: var(--black);
+    border-top: var(--app-border-width) solid var(--app-accent-color);
+    border-bottom: none;
+    box-shadow: 0 -0.3rem 0.8rem rgba(0, 0, 0, 0.35);
+    animation: genre-nav-dock 0.2s ease-out;
+  }
+
+  .genre-nav__bar.is-docked li {
+    padding-block: 0.75rem;
+  }
+
+  /* Don't let the docked bar cover the end of the page */
+  :global(html.genre-nav-docked body) {
+    padding-bottom: var(--genre-nav-height);
+  }
+
+  @keyframes genre-nav-dock {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .genre-nav__bar.is-docked {
+      animation: none;
+    }
+  }
+
+  @media print {
+    .genre-nav {
+      display: none;
+    }
+  }
+</style>

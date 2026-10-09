@@ -1,0 +1,208 @@
+/* inter-latin-wght-normal */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(@fontsource-variable/inter/files/inter-latin-wght-normal.woff2)
+    format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+/* host-grotesk-latin-wght-normal */
+@font-face {
+  font-family: "Host Grotesk Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 800;
+  src: url(@fontsource-variable/host-grotesk/files/host-grotesk-latin-wght-normal.woff2)
+    format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+:root,
+:host {
+  /* Font families */
+  --app-font-family-emoji:
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --app-font-family-sans-serif:
+    "Inter Variable", system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    Helvetica, Arial, "Helvetica Neue", sans-serif, var(--app-font-family-emoji);
+  --app-font-family-headings:
+    "Host Grotesk Variable", "Inter Variable", system-ui, sans-serif,
+    var(--app-font-family-emoji);
+  --app-font-family-serif: "Times New Roman", Times, serif;
+  --app-font-family-monospace:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace, var(--app-font-family-emoji);
+  --app-font-family: var(--app-font-family-sans-serif);
+
+  /* Base type scale */
+  --app-font-size: 100%;
+  --app-font-weight: 400;
+  --app-line-height: 1.5;
+  --app-typography-spacing-vertical: 1rem;
+  --app-text-underline-offset: 0.2em;
+}
+
+/* =========================================================
+   Prose elements
+   ========================================================= */
+blockquote,
+ol,
+ul,
+p {
+  margin-top: 0;
+  margin-bottom: var(--app-typography-spacing-vertical);
+  color: var(--app-color);
+  font-style: normal;
+  font-weight: var(--app-font-weight);
+}
+
+blockquote {
+  display: block;
+  margin: var(--app-typography-spacing-vertical) 0;
+  padding: var(--app-spacing);
+  border-right: none;
+  border-inline-start: 0.25rem solid var(--app-border-color);
+  border-inline-end: none;
+}
+
+/* =========================================================
+   Headings — Host Grotesk for display character
+   ========================================================= */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: var(--app-typography-spacing-vertical);
+  color: var(--app-color);
+  font-family: var(--app-font-family-headings);
+  font-weight: var(--app-font-weight);
+  font-size: var(--app-font-size);
+  line-height: var(--app-line-height);
+}
+
+/* Spacing bump when headings follow prose */
+:where(article, blockquote, ol, ul, p) ~ :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: var(--app-typography-spacing-top);
+}
+
+h1 {
+  --app-font-size: 2rem;
+  --app-font-weight: 900;
+  --app-line-height: 1.125;
+  --app-typography-spacing-top: 3rem;
+  font-size: var(--app-font-size);
+  font-weight: var(--app-font-weight);
+  line-height: var(--app-line-height);
+}
+
+h2 {
+  --app-font-size: 1.75rem;
+  --app-font-weight: 700;
+  --app-line-height: 1.15;
+  --app-typography-spacing-top: 2.625rem;
+  font-size: var(--app-font-size);
+  font-weight: var(--app-font-weight);
+  line-height: var(--app-line-height);
+}
+
+h3 {
+  --app-font-size: 1.5rem;
+  --app-font-weight: 500;
+  --app-line-height: 1.175;
+  --app-typography-spacing-top: 2.25rem;
+  font-size: var(--app-font-size);
+  font-weight: var(--app-font-weight);
+  line-height: var(--app-line-height);
+}
+
+h4 {
+  --app-font-size: 1.25rem;
+  --app-font-weight: 400;
+  --app-line-height: 1.2;
+  --app-typography-spacing-top: 1.875rem;
+  font-size: var(--app-font-size);
+  font-weight: var(--app-font-weight);
+  line-height: var(--app-line-height);
+}
+
+h5 {
+  --app-font-size: 1.125rem;
+  --app-font-weight: 300;
+  --app-line-height: 1.225;
+  --app-typography-spacing-top: 1.6875rem;
+  font-size: var(--app-font-size);
+  font-weight: var(--app-font-weight);
+  line-height: var(--app-line-height);
+}
+
+h6 {
+  --app-font-size: 1rem;
+  --app-font-weight: 300;
+  --app-line-height: 1.25;
+  --app-typography-spacing-top: 1.5rem;
+  font-size: var(--app-font-size);
+  font-weight: var(--app-font-weight);
+  line-height: var(--app-line-height);
+}
+
+/* =========================================================
+   Code & monospace
+   ========================================================= */
+pre,
+code,
+kbd,
+samp {
+  font-size: 0.875em;
+  font-family: var(--app-font-family-monospace);
+  border-radius: var(--app-border-radius);
+  background: var(--app-code-background-color, var(--gray-700));
+  color: var(--app-color);
+  font-weight: var(--app-font-weight);
+  line-height: initial;
+}
+
+pre code,
+pre samp {
+  font-size: inherit;
+  font-family: inherit;
+  background: none;
+  line-height: var(--app-line-height);
+}
+
+code,
+kbd,
+samp {
+  display: inline-block;
+  padding: 0.375rem;
+}
+
+pre {
+  display: block;
+  margin-bottom: var(--app-spacing);
+  overflow-x: auto;
+  -ms-overflow-style: scrollbar;
+}
+
+pre > code,
+pre > samp {
+  display: block;
+  padding: var(--app-spacing);
+}
+
+kbd {
+  background-color: var(--app-background-color);
+  color: var(--app-color);
+  vertical-align: baseline;
+}

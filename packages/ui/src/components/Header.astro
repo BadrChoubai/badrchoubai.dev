@@ -1,0 +1,99 @@
+---
+import { links } from "../links";
+
+interface Props {
+  /** Names the site in the logo link's label, e.g. "Bookshelf" */
+  title?: string;
+}
+
+const { title = "Badr Choubai" } = Astro.props;
+
+const isCurrent = (href: string) => {
+  const url = new URL(href);
+  return (
+    !url.hash &&
+    url.origin === Astro.url.origin &&
+    url.pathname === Astro.url.pathname
+  );
+};
+---
+
+<header id="header" class="container">
+  <a href="/" class="logo" aria-label={`${title} — home`}>
+    <div class="blocks">
+      <div class="block block-1"></div>
+      <div class="block block-2"></div>
+      <div class="block block-3"></div>
+      <div class="block block-4"></div>
+      <div class="block block-5"></div>
+    </div>
+    <div class="logo__title">
+      <span class="logo__title__first">Badr</span>
+      <span class="logo__title__last">Choubai</span>
+    </div>
+  </a>
+  <nav aria-label="Site navigation">
+    <ul>
+      {
+        links.map(({ label, href }) => (
+          <li>
+            <a {href} aria-current={isCurrent(href) ? "page" : undefined}>
+              {label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 1rem;
+    background-color: var(--black);
+  }
+
+  .logo {
+    font-family: var(--app-font-family-headings);
+    font-size: 2rem;
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--app-spacing);
+  }
+
+  .logo__title {
+    .logo__title__first {
+      color: var(--app-accent-color);
+    }
+
+    .logo__title__last {
+      color: var(--app-color);
+    }
+  }
+
+  .block {
+    height: 10px;
+    width: 10px;
+  }
+  .block-1 {
+    background-color: var(--red);
+  }
+  .block-2 {
+    background-color: var(--orange);
+  }
+  .block-3 {
+    background-color: var(--yellow);
+  }
+  .block-4 {
+    background-color: var(--green);
+  }
+  .block-5 {
+    background-color: var(--blue);
+  }
+</style>

@@ -1,0 +1,128 @@
+<footer class="site-footer" id="footer">
+  <div class="container">
+    <div class="site-footer__inner">
+      <div class="site-footer__column">
+        <h3>Online</h3>
+        <nav>
+          <ul>
+            <li><a href="https://badrchoubai.dev/">home</a></li>
+            <li>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.github.com/BadrChoubai">github</a
+              >
+            </li>
+            <li>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.linkedin.com/in/BadrChoubai">linkedin</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="site-footer__column">
+        <h3>Offline</h3>
+        <nav>
+          <ul>
+            <li>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.strava.com/athletes/101721008">strava</a
+              >
+            </li>
+            <li>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://open.spotify.com/user/qvo0hw19xy5khwaoanfo27fu7"
+                >spotify</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <small>&copy; 2026 Badr Choubai</small>
+      <a href="#top">back to top</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer__inner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--app-spacing);
+  }
+
+  .site-footer__column {
+    margin: 1rem 0;
+    padding-inline: var(--app-block-spacing-horizontal);
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 0;
+    }
+  }
+
+  /* Plain links; thin orange underline slides in on hover/focus */
+  .site-footer a {
+    text-decoration: none;
+    background-image: linear-gradient(
+      var(--accent, #d9680f),
+      var(--accent, #d9680f)
+    );
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.2s ease;
+  }
+
+  .site-footer a:hover,
+  .site-footer a:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .site-footer a:focus-visible {
+    outline: 2px solid var(--accent, #d9680f);
+    outline-offset: 3px;
+  }
+
+  /* Bottom bar: hairline rule to match the section dividers above */
+  .site-footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem var(--app-block-spacing-horizontal);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.875rem;
+    opacity: 0.75;
+  }
+
+  @media screen and (max-width: 749px) {
+    .site-footer__inner {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer a {
+      transition: none;
+    }
+  }
+</style>

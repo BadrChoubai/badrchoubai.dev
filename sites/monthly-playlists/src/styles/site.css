@@ -1,0 +1,72 @@
+/* Shared base styles, plus what only this site needs */
+@import url("@badrchoubai/ui/styles/base.css");
+
+main {
+    /* Fill the viewport so the footer sits at the bottom on short pages */
+    flex: 1;
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--app-spacing);
+    padding-block: var(--app-spacing);
+    border-top: var(--app-border-width) solid var(--app-border-color);
+    font-size: 0.875rem;
+}
+
+.footer p,
+.footer ul {
+    margin: 0;
+}
+
+.footer ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-spacing);
+    padding: 0;
+    list-style: none;
+}
+
+.footer li {
+    margin: 0;
+    list-style: none;
+}
+
+.footer a:hover {
+    color: var(--app-accent-color--hover);
+}
+
+/* Sections are flex containers, which would otherwise override [hidden] */
+section[hidden] {
+    display: none;
+}
+
+/* =========================================================
+   Playlists
+   ========================================================= */
+.playlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: var(--app-spacing);
+}
+
+.playlist h3 {
+    margin-bottom: calc(var(--app-typography-spacing-vertical) * 0.5);
+}
+
+.playlist iframe {
+    display: block;
+    border: 0;
+    border-radius: 12px;
+}
+
+.btn[aria-pressed="true"] {
+    background-color: var(--app-accent-background);
+    border-color: var(--app-accent-background);
+}

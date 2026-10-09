@@ -1,0 +1,38 @@
+:root,
+:host {
+  /* =========================================================
+       Palette
+       ========================================================= */
+  --black: #000000;
+  --gray-800: #222222;
+  --gray-700: #333333;
+  --gray-500: #555555;
+  --white: #ffffff;
+
+  --red: #a03c46;
+  --orange: #d45a01;
+  --orange--lighten: #e77322;
+  --orange--darken: #b84e00;
+  --orange--darken-hover: #c25200;
+  --yellow: #ccaa11;
+  --green: #64a03c;
+  --green--darken: #467d27;
+  --blue: #3c70a0;
+
+  /* =========================================================
+       Semantic surface tokens
+       ========================================================= */
+  --app-background-color: var(--gray-800);
+  --app-color: var(--white);
+  --app-border-color: var(--gray-500);
+
+  /* =========================================================
+       Accent colors
+       ========================================================= */
+  --app-accent-color: var(--orange);
+  --app-accent-color--hover: var(--orange--lighten);
+
+  /* Button fills: darker so white text meets WCAG AA (4.5:1) */
+  --app-accent-background: var(--orange--darken);
+  --app-accent-background--hover: var(--orange--darken-hover);
+}

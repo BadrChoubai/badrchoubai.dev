@@ -1,0 +1,93 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PlaylistEmbed from "../components/PlaylistEmbed.astro";
+import { playlists } from "../data/playlists";
+
+// Newest year first
+const years = [...new Set(playlists.map((p) => p.year))].sort((a, b) => b - a);
+---
+
+<Layout>
+    <section>
+        <h1>Monthly Playlists</h1>
+        <nav aria-label="Filter by year">
+            <ul>
+                <li>
+                    <button
+                        type="button"
+                        class="btn ghost"
+                        data-filter="all"
+                        aria-pressed="true">All</button
+                    >
+                </li>
+                {
+                    years.map((year) => (
+                        <li>
+                            <button
+                                type="button"
+                                class="btn ghost"
+                                data-filter={year}
+                                aria-pressed="false"
+                            >
+                                {year}
+                            </button>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+    </section>
+    {
+        years.map((year) => (
+            <section id={`year-${year}`} data-year={year}>
+                <h2>{year}</h2>
+                <div class="playlist-grid">
+                    {playlists
+                        .filter((p) => p.year === year)
+                        .map((p) => (
+                            <PlaylistEmbed month={p.month} id={p.id} />
+                        ))}
+                </div>
+            </section>
+        ))
+    }
+</Layout>
+
+<script>
+    const buttons =
+        document.querySelectorAll<HTMLButtonElement>("[data-filter]");
+    const sections =
+        document.querySelectorAll<HTMLElement>("section[data-year]");
+
+    function applyFilter(filter: string) {
+        // Fall back to "all" for unknown years, e.g. a stale ?year= link
+        const known = [...buttons].some((b) => b.dataset.filter === filter);
+        const active = known ? filter : "all";
+
+        sections.forEach((section) => {
+            section.hidden =
+                active !== "all" && section.dataset.year !== active;
+        });
+        buttons.forEach((button) => {
+            button.setAttribute(
+                "aria-pressed",
+                String(button.dataset.filter === active),
+            );
+        });
+        return active;
+    }
+
+    buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const active = applyFilter(button.dataset.filter ?? "all");
+            const url = new URL(window.location.href);
+            if (active === "all") url.searchParams.delete("year");
+            else url.searchParams.set("year", active);
+            history.replaceState(null, "", url);
+        });
+    });
+
+    applyFilter(
+        new URLSearchParams(window.location.search).get("year") ?? "all",
+    );
+</script>

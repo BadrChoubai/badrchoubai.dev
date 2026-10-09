@@ -1,0 +1,21 @@
+{
+  "name": "bookshelf",
+  "compatibility_date": "2025-11-11",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "bookshelf.badrchoubai.dev",
+      "custom_domain": true,
+    },
+  ],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": "./dist",
+  },
+  "images": {
+    "binding": "IMAGES",
+  },
+  "observability": {
+    "enabled": true,
+  },
+}

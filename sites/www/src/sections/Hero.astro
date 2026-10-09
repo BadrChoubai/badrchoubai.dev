@@ -1,0 +1,150 @@
+---
+import SquareIcon from "../components/Icons/SquareIcon.astro";
+import DotIcon from "../components/Icons/DotIcon.astro";
+import DiamondIcon from "../components/Icons/DiamondIcon.astro";
+import Section from "../components/Section.astro";
+import { getImage } from "astro:assets";
+import heroImage from "../assets/images/SCM.jpg";
+
+const optimizedHero = await getImage({
+    src: heroImage,
+    width: 1920,
+    format: "webp",
+    quality: 75,
+});
+const imageUrl = optimizedHero.src;
+---
+
+<Section class="section" coverImage={imageUrl} id="hero">
+    <div class="hero__inner">
+        <div class="hero__intro">
+            <h1>
+                <span>Develop<SquareIcon /></span>
+                <span>Build<DotIcon /></span>
+                <span>Deploy<DiamondIcon /></span>
+            </h1>
+
+            <div class="group hero__desc">
+                <h2>It's what I <em class="text-serif">do</em>.</h2>
+                <p>
+                    Right now, I'm finishing my Bachelor's degree. Building
+                    things if they interest me. Reading lots. Being offline.
+                </p>
+            </div>
+
+            <div class="hero__ctas">
+                <a
+                    class="btn primary sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://www.linkedin.com/in/BadrChoubai">About Me</a
+                >
+                <a
+                    class="btn ghost sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://www.github.com/BadrChoubai">GitHub</a
+                >
+            </div>
+        </div>
+
+        <aside class="hero__playlist" aria-labelledby="playlist-heading">
+            <h2 id="playlist-heading">Playlist of the Month</h2>
+            <iframe
+                title="Spotify playlist of the month"
+                src="https://open.spotify.com/embed/playlist/1A5RiMZcQDLtY6wWEq4S4Z?utm_source=generator&si=7a237fe4ebb24623"
+                width="100%"
+                height="352"
+                loading="lazy"></iframe>
+            <div class="hero__playlist__buttons">
+                <a
+                    class="btn green sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://open.spotify.com/user/qvo0hw19xy5khwaoanfo27fu7"
+                    >Follow Me on Spotify</a
+                >
+                <a
+                    class="btn ghost sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://playlists.badrchoubai.dev/">All Playlists</a
+                >
+            </div>
+        </aside>
+    </div>
+</Section>
+
+<style>
+    .hero__inner {
+        display: grid;
+        grid-template-columns: 1fr minmax(0, 28rem);
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+        background-color: rgba(0, 0, 0, 0.66);
+    }
+
+    /* Headline */
+    h1 {
+        display: flex;
+        flex-direction: column;
+        gap: 0.05em;
+        margin-bottom: 2rem;
+        font-size: clamp(3rem, 8vw, 6rem);
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        color: var(--white);
+    }
+
+    h1 :global(svg) {
+        display: inline-block;
+        vertical-align: bottom;
+        margin-bottom: 0.1em;
+        margin-left: 0.1em;
+    }
+
+    .text-serif {
+        font-family: var(--app-font-family-serif);
+        font-style: italic;
+    }
+
+    .hero__desc {
+        max-width: 400px;
+    }
+
+    .hero__ctas {
+        display: flex;
+        gap: var(--app-spacing);
+        margin-top: var(--app-spacing);
+    }
+
+    /* Playlist column */
+    .hero__playlist {
+        display: flex;
+        flex-direction: column;
+        gap: var(--app-spacing);
+    }
+
+    .hero__playlist iframe {
+        display: block;
+        border: 0;
+        border-radius: 12px;
+    }
+
+    .hero__playlist__buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: var(--app-spacing);
+    }
+
+    @media screen and (max-width: 749px) {
+        .hero__inner {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+            gap: var(--app-spacing);
+        }
+    }
+</style>

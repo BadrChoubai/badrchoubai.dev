@@ -1,0 +1,143 @@
+---
+import { getCollection } from "astro:content";
+import Section from "../components/Section.astro";
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<Section class="section" id="projects">
+  <h2>Projects</h2>
+
+  <ul class="projects" role="list">
+    {
+      projects.map(({ data }) => (
+        <li class="project">
+          <h3 class="project__title">{data.title}</h3>
+          <p class="project__desc">{data.description}</p>
+          <ul class="project__stack" aria-label="Built with">
+            {data.stack.map((tech) => (
+              <li>{tech}</li>
+            ))}
+          </ul>
+          <div class="project__links">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={data.repo}
+              aria-label={`${data.title} source code on GitHub`}
+            >
+              source
+            </a>
+            {data.live && (
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={data.live}
+                aria-label={`${data.title} live site`}
+              >
+                live
+              </a>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Section>
+
+<style>
+  h2 {
+    margin-bottom: 0;
+  }
+
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--app-spacing);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: var(--app-spacing);
+    border: var(--app-border-width) solid var(--app-border-color);
+    list-style: none;
+    transition: border-color var(--app-transition);
+  }
+
+  .project:hover,
+  .project:focus-within {
+    border-color: var(--app-accent-color);
+  }
+
+  .project__title {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .project__desc {
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  /* Stack tags: monospace chips */
+  .project__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin: 0;
+      padding: 0.15rem 0.5rem;
+      list-style: none;
+      background-color: var(--gray-700);
+      font-family: var(--app-font-family-monospace);
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Links: same sliding underline as the footer */
+  .project__links {
+    display: flex;
+    gap: var(--app-spacing);
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.875rem;
+  }
+
+  .project__links a {
+    background-image: linear-gradient(
+      var(--app-accent-color),
+      var(--app-accent-color)
+    );
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.2s ease;
+  }
+
+  .project__links a:hover,
+  .project__links a:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .project__links a:focus-visible {
+    outline: 2px solid var(--app-accent-color);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project,
+    .project__links a {
+      transition: none;
+    }
+  }
+</style>

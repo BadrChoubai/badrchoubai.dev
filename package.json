@@ -1,0 +1,18 @@
+{
+  "name": "badrchoubai-dev",
+  "description": "My sites and the components they share.",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "sites/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "lint": "prettier . --write"
+  },
+  "devDependencies": {
+    "prettier": "3.8.1",
+    "prettier-plugin-astro": "0.14.1"
+  }
+}

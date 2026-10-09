@@ -1,0 +1,19 @@
+{
+  "name": "@badrchoubai/ui",
+  "description": "Components and styles shared across my sites.",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./Header.astro": "./src/components/Header.astro",
+    "./Footer.astro": "./src/components/Footer.astro",
+    "./styles/*": "./src/styles/*"
+  },
+  "dependencies": {
+    "@fontsource-variable/host-grotesk": "^5.2.8",
+    "@fontsource-variable/inter": "^5.2.8"
+  },
+  "peerDependencies": {
+    "astro": "^6.0.3"
+  }
+}

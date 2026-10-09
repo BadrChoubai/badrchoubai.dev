@@ -1,0 +1,46 @@
+/* =========================================================
+   Document — box model resets & global rendering
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+}
+
+::before,
+::after {
+  text-decoration: inherit;
+  vertical-align: inherit;
+}
+
+:where(:root),
+:where(:host) {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background-color: var(--app-background-color);
+  color: var(--app-color);
+  font-weight: var(--app-font-weight);
+  font-size: var(--app-font-size);
+  line-height: var(--app-line-height);
+  font-family: var(--app-font-family);
+  text-underline-offset: var(--app-text-underline-offset, 0.2em);
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+}
+
+@media print {
+  #header,
+  #footer {
+    display: none;
+  }
+
+  @page {
+    margin: 0;
+  }
+}

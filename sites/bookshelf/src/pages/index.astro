@@ -1,0 +1,145 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import { genres } from "../genres";
+import Layout from "../layouts/Layout.astro";
+import Section from "../components/Section.astro";
+import BookCover from "../components/BookCover.astro";
+import GenreNav from "../components/GenreNav.astro";
+
+type Book = CollectionEntry<"books">["data"];
+
+/**
+ * Catalogue heading for the first-listed author, inverted library-style:
+ * "Kurt Vonnegut Jr." -> "Vonnegut, Kurt".
+ */
+const heading = ({ author, authorSort }: Book) => {
+  if (authorSort) return authorSort;
+  const names = author
+    .split("&")[0]
+    .trim()
+    .replace(/,?\s+(Jr|Sr)\.?$/, "")
+    .split(/\s+/);
+  const surname = names.pop()!;
+  return `${surname}, ${names.join(" ")}`;
+};
+
+/** Titles file without a leading article: "The Fall" under "Fall". */
+const filingTitle = ({ title }: Book) => title.replace(/^(a|an|the)\s+/i, "");
+
+// Word-by-word, ignoring case and diacritics ("Endō" files as "Endo")
+const { compare } = new Intl.Collator("en", {
+  sensitivity: "base",
+  numeric: true,
+});
+
+const byAuthor = (a: Book, b: Book) =>
+  compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
+
+const books = (await getCollection("books")).map(({ data }) => data);
+const shelves = genres
+  .map((genre) => ({
+    genre,
+    id: genre.toLowerCase().replace(/[^a-z]+/g, "-"),
+    books: books.filter((book) => book.genre === genre).sort(byAuthor),
+  }))
+  .filter((shelf) => shelf.books.length > 0);
+---
+
+<Layout title="Bookshelf" description="What I've Read.">
+  <Section class="section" id="shelf">
+    <div class="group">
+      <h1>Bookshelf</h1>
+      <p>What I've been reading, by genre.</p>
+    </div>
+
+    <GenreNav {shelves} />
+
+    {
+      shelves.map(({ genre, id, books }) => (
+        <section class="genre" aria-labelledby={id}>
+          <h2 id={id}>{genre}</h2>
+          <ul class="shelf" role="list">
+            {books.map((book) => {
+              const Tag = book.link ? "a" : "div";
+              return (
+                <li class="book">
+                  <Tag
+                    class="book__inner"
+                    {...(book.link && {
+                      href: book.link,
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    })}
+                  >
+                    <BookCover book={book} />
+                    <span class="book__title">{book.title}</span>
+                    <span class="book__author">{book.author}</span>
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </Section>
+</Layout>
+
+<style>
+  /* Genre shelves keep the global section divider, not its side padding */
+  .genre {
+    padding-inline: 0;
+    padding-block: var(--app-spacing) calc(var(--app-spacing) * 2);
+  }
+
+  .shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: calc(var(--app-spacing) * 2) var(--app-spacing);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .book {
+    margin: 0;
+    list-style: none;
+  }
+
+  .book__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .book :global(.cover) {
+    transition: transform var(--app-transition);
+  }
+
+  .book__inner:hover :global(.cover),
+  a.book__inner:focus-visible :global(.cover) {
+    transform: translateY(-0.35rem);
+  }
+
+  a.book__inner:focus-visible {
+    outline: 2px solid var(--app-accent-color);
+    outline-offset: 3px;
+  }
+
+  .book__title {
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .book__author {
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book :global(.cover) {
+      transition: none;
+    }
+  }
+</style>
