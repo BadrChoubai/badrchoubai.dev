@@ -57,7 +57,12 @@ const shelves = genres
     {
       shelves.map(({ genre, id, books }) => (
         <section class="genre" aria-labelledby={id}>
-          <h2 id={id}>{genre}</h2>
+          <h2 id={id}>
+            {genre}{" "}
+            <span class="genre__count">
+              {books.length} {books.length === 1 ? "book" : "books"}
+            </span>
+          </h2>
           <ul class="shelf" role="list">
             {books.map((book) => {
               const Tag = book.link ? "a" : "div";
@@ -90,6 +95,14 @@ const shelves = genres
   .genre {
     padding-inline: 0;
     padding-block: var(--app-spacing) calc(var(--app-spacing) * 2);
+  }
+
+  .genre__count {
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.875rem;
+    font-weight: 400;
+    white-space: nowrap;
+    opacity: 0.75;
   }
 
   .shelf {
