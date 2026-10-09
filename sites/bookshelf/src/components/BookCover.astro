@@ -30,6 +30,7 @@ const { book, width = 320 } = Astro.props;
     background-color: var(--cover-color);
     box-shadow: var(--app-box-shadow);
     overflow: hidden;
+    container-type: inline-size;
   }
 
   .cover img {
@@ -45,16 +46,18 @@ const { book, width = 320 } = Astro.props;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    padding: 1rem 1rem 1rem 1.5rem;
+    /* Scale with the cover so long titles fit narrow (mobile) shelves */
+    padding: min(1rem, 8cqi) min(1rem, 8cqi) min(1rem, 8cqi) min(1.5rem, 12cqi);
     border-left: 0.5rem solid rgba(0, 0, 0, 0.25);
     color: var(--black);
   }
 
   .cover__title {
     font-family: var(--app-font-family-headings);
-    font-size: 1.25rem;
+    font-size: min(1.25rem, 9cqi);
     font-weight: 700;
     line-height: 1.1;
+    hyphens: auto;
   }
 
   .cover__author {
