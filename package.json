@@ -8,10 +8,14 @@
     "sites/*"
   ],
   "scripts": {
+    "dev": "concurrently -k -n www,bookshelf -c blue,magenta \"npm:dev:www\" \"npm:dev:bookshelf\"",
+    "dev:www": "npm run dev -w sites/www",
+    "dev:bookshelf": "npm run dev -w sites/bookshelf",
     "build": "npm run build --workspaces --if-present",
     "lint": "prettier . --write"
   },
   "devDependencies": {
+    "concurrently": "10.0.6",
     "prettier": "3.8.1",
     "prettier-plugin-astro": "0.14.1"
   }

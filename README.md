@@ -12,9 +12,14 @@ sites/bookshelf/          bookshelf.badrchoubai.dev
 
 ```sh
 npm install                          # once, from the repo root
-npm run dev -w sites/bookshelf       # one site
+npm run dev                          # every site, side by side
+npm run dev:www                      # just www         → localhost:4321
+npm run dev:bookshelf                # just bookshelf   → localhost:4322
 npm run build                        # every site
 ```
+
+`packages/ui` has no dev server of its own: the sites import its source
+directly, so edits there hot-reload in whichever site is running.
 
 The site-wide menu lives in `packages/ui/src/links.ts`.
 
