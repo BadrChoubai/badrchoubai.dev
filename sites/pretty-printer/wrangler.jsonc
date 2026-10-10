@@ -3,10 +3,11 @@
   "compatibility_date": "2026-01-05",
   // Older share links point at pretty-printer.choubai-badr.workers.dev, so keep it up
   "workers_dev": true,
+  // Served through a zone route and a proxied DNS record, not a Workers custom domain
   "routes": [
     {
-      "pattern": "pretty-printer.badrchoubai.dev",
-      "custom_domain": true,
+      "pattern": "pretty-printer.badrchoubai.dev/*",
+      "zone_name": "badrchoubai.dev",
     },
   ],
   "assets": {
