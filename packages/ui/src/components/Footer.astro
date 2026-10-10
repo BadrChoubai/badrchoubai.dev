@@ -1,3 +1,12 @@
+---
+interface Props {
+  /** Show the "back to top" link; turn off on sites that use BackToTop */
+  backToTop?: boolean;
+}
+
+const { backToTop = true } = Astro.props;
+---
+
 <footer class="site-footer" id="footer">
   <div class="container">
     <div class="site-footer__inner">
@@ -49,7 +58,7 @@
 
     <div class="site-footer__bottom">
       <small>&copy; 2026 Badr Choubai</small>
-      <a href="#top">back to top</a>
+      {backToTop && <a href="#top">back to top</a>}
     </div>
   </div>
 </footer>
