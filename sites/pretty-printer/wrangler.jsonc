@@ -1,0 +1,18 @@
+{
+  "name": "pretty-printer",
+  "compatibility_date": "2026-01-05",
+  // Older share links point at pretty-printer.choubai-badr.workers.dev, so keep it up
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "pretty-printer.badrchoubai.dev",
+      "custom_domain": true,
+    },
+  ],
+  "assets": {
+    "directory": "./dist",
+  },
+  "observability": {
+    "enabled": true,
+  },
+}
