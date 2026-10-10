@@ -12,7 +12,8 @@ interface Props {
 const { threshold = 300, bottom } = Astro.props;
 ---
 
-<!-- Revealed by the script; without it the footer's "back to top" link remains -->
+<!-- Revealed by the script; without JavaScript there's no back-to-top control
+     unless the footer's link is kept (Footer's backToTop prop) -->
 <button
   type="button"
   class="back-to-top"
