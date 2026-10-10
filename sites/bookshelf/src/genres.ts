@@ -1,4 +1,4 @@
-// Shelf sections, shown in this order
+// Shelf sections; the page lists them alphabetically
 export const genres = [
   "Fiction",
   "Philosophy",

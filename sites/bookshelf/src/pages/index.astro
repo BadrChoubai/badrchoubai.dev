@@ -13,14 +13,14 @@ type Book = CollectionEntry<"books">["data"];
  * "Kurt Vonnegut Jr." -> "Vonnegut, Kurt".
  */
 const heading = ({ author, authorSort }: Book) => {
-  if (authorSort) return authorSort;
-  const names = author
-    .split("&")[0]
-    .trim()
-    .replace(/,?\s+(Jr|Sr)\.?$/, "")
-    .split(/\s+/);
-  const surname = names.pop()!;
-  return `${surname}, ${names.join(" ")}`;
+    if (authorSort) return authorSort;
+    const names = author
+        .split("&")[0]
+        .trim()
+        .replace(/,?\s+(Jr|Sr)\.?$/, "")
+        .split(/\s+/);
+    const surname = names.pop()!;
+    return `${surname}, ${names.join(" ")}`;
 };
 
 /** Titles file without a leading article: "The Fall" under "Fall". */
@@ -28,8 +28,8 @@ const filingTitle = ({ title }: Book) => title.replace(/^(a|an|the)\s+/i, "");
 
 // Word-by-word, ignoring case and diacritics ("Endō" files as "Endo")
 const { compare } = new Intl.Collator("en", {
-  sensitivity: "base",
-  numeric: true,
+    sensitivity: "base",
+    numeric: true,
 });
 
 /**
@@ -37,187 +37,194 @@ const { compare } = new Intl.Collator("en", {
  * but renders the same on every build.
  */
 const jitter = (seed: string) => {
-  let hash = 0;
-  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) | 0;
-  return (Math.abs(hash) % 1000) / 1000;
+    let hash = 0;
+    for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+    return (Math.abs(hash) % 1000) / 1000;
 };
 
 /** Spine width and indent for a book lying on its side (mobile). */
 const spineStyle = ({ title, color }: Book) => {
-  const width = 90 + jitter(title) * 10;
-  const offset = jitter(title.split("").reverse().join("")) * (100 - width);
-  return `--spine-color: ${color}; --spine-width: ${width.toFixed(1)}%; --spine-offset: ${offset.toFixed(1)}%;`;
+    const width = 90 + jitter(title) * 10;
+    const offset = jitter(title.split("").reverse().join("")) * (100 - width);
+    return `--spine-color: ${color}; --spine-width: ${width.toFixed(1)}%; --spine-offset: ${offset.toFixed(1)}%;`;
 };
 
 const byAuthor = (a: Book, b: Book) =>
-  compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
+    compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
 
 const books = (await getCollection("books")).map(({ data }) => data);
-const shelves = genres
-  .map((genre) => ({
-    genre,
-    id: genre.toLowerCase().replace(/[^a-z]+/g, "-"),
-    books: books.filter((book) => book.genre === genre).sort(byAuthor),
-  }))
-  .filter((shelf) => shelf.books.length > 0);
+const shelves = [...genres]
+    .sort(compare)
+    .map((genre) => ({
+        genre,
+        id: genre.toLowerCase().replace(/[^a-z]+/g, "-"),
+        books: books.filter((book) => book.genre === genre).sort(byAuthor),
+    }))
+    .filter((shelf) => shelf.books.length > 0);
 ---
 
 <Layout title="Bookshelf" description="What I've Read.">
-  <Section class="section" id="shelf">
-    <div class="group">
-      <h1>Bookshelf</h1>
-      <p>What I've been reading, by genre.</p>
-    </div>
+    <Section class="section" id="shelf">
+        <div class="group">
+            <h1>Bookshelf</h1>
+            <p>What I've read, by genre.</p>
+            <p>Total Amount of Books Read: {books.length}</p>
+        </div>
 
-    <GenreNav {shelves} />
+        <GenreNav {shelves} />
 
-    {
-      shelves.map(({ genre, id, books }) => (
-        <section class="genre" aria-labelledby={id}>
-          <h2 id={id}>
-            {genre}{" "}
-            <span class="genre__count">
-              {books.length} {books.length === 1 ? "book" : "books"}
-            </span>
-          </h2>
-          <ul class="shelf" role="list">
-            {books.map((book) => {
-              const Tag = book.link ? "a" : "div";
-              return (
-                <li class="book" style={spineStyle(book)}>
-                  <Tag
-                    class="book__inner"
-                    {...(book.link && {
-                      href: book.link,
-                      target: "_blank",
-                      rel: "noopener noreferrer",
-                    })}
-                  >
-                    <BookCover book={book} />
-                    <span class="book__title">{book.title}</span>
-                    <span class="book__author">{book.author}</span>
-                  </Tag>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))
-    }
-  </Section>
+        {
+            shelves.map(({ genre, id, books }) => (
+                <section class="genre" aria-labelledby={id}>
+                    <h2 id={id}>
+                        {genre}{" "}
+                        <span class="genre__count">
+                            {books.length}{" "}
+                            {books.length === 1 ? "book" : "books"}
+                        </span>
+                    </h2>
+                    <ul class="shelf" role="list">
+                        {books.map((book) => {
+                            const Tag = book.link ? "a" : "div";
+                            return (
+                                <li class="book" style={spineStyle(book)}>
+                                    <Tag
+                                        class="book__inner"
+                                        {...(book.link && {
+                                            href: book.link,
+                                            target: "_blank",
+                                            rel: "noopener noreferrer",
+                                        })}
+                                    >
+                                        <BookCover book={book} />
+                                        <span class="book__title">
+                                            {book.title}
+                                        </span>
+                                        <span class="book__author">
+                                            {book.author}
+                                        </span>
+                                    </Tag>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </section>
+            ))
+        }
+    </Section>
 </Layout>
 
 <style>
-  /* Genre shelves keep the global section divider, not its side padding */
-  .genre {
-    padding-inline: 0;
-    padding-block: var(--app-spacing) calc(var(--app-spacing) * 2);
-  }
+    /* Genre shelves keep the global section divider, not its side padding */
+    .genre {
+        padding-inline: 0;
+        padding-block: var(--app-spacing) calc(var(--app-spacing) * 2);
+    }
 
-  .genre__count {
-    font-family: var(--app-font-family-monospace);
-    font-size: 0.875rem;
-    font-weight: 400;
-    white-space: nowrap;
-    opacity: 0.75;
-  }
+    .genre__count {
+        font-family: var(--app-font-family-monospace);
+        font-size: 0.875rem;
+        font-weight: 400;
+        white-space: nowrap;
+        opacity: 0.75;
+    }
 
-  .shelf {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: calc(var(--app-spacing) * 2) var(--app-spacing);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .book {
-    margin: 0;
-    list-style: none;
-  }
-
-  .book__inner {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .book :global(.cover) {
-    transition: transform var(--app-transition);
-  }
-
-  .book__inner:hover :global(.cover),
-  a.book__inner:focus-visible :global(.cover) {
-    transform: translateY(-0.35rem);
-  }
-
-  a.book__inner:focus-visible {
-    outline: 2px solid var(--app-accent-color);
-    outline-offset: 3px;
-  }
-
-  .book__title {
-    font-weight: 700;
-    line-height: 1.2;
-  }
-
-  .book__author {
-    font-family: var(--app-font-family-monospace);
-    font-size: 0.75rem;
-    opacity: 0.75;
-  }
-
-  /* Mobile: books lie on their side, stacked spine over spine */
-  @media (max-width: 749px) {
     .shelf {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        gap: calc(var(--app-spacing) * 2) var(--app-spacing);
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
     .book {
-      width: var(--spine-width);
-      margin-inline-start: var(--spine-offset);
+        margin: 0;
+        list-style: none;
+    }
+
+    .book__inner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
     .book :global(.cover) {
-      display: none;
+        transition: transform var(--app-transition);
     }
 
-    .book__inner {
-      flex-flow: row wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.25rem 1rem;
-      padding: 0.75rem 1rem 0.75rem 1.25rem;
-      border-left: 0.5rem solid rgba(0, 0, 0, 0.25);
-      background-color: var(--spine-color);
-      box-shadow: var(--app-box-shadow);
-      color: var(--black);
-      text-decoration: none;
-      transition: transform var(--app-transition);
+    .book__inner:hover :global(.cover),
+    a.book__inner:focus-visible :global(.cover) {
+        transform: translateY(-0.35rem);
     }
 
-    .book__inner:hover,
     a.book__inner:focus-visible {
-      transform: translateX(0.35rem);
+        outline: 2px solid var(--app-accent-color);
+        outline-offset: 3px;
     }
 
     .book__title {
-      font-family: var(--app-font-family-headings);
-      overflow-wrap: normal;
+        font-weight: 700;
+        line-height: 1.2;
     }
 
     .book__author {
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+        font-family: var(--app-font-family-monospace);
+        font-size: 0.75rem;
+        opacity: 0.75;
     }
-  }
 
-  @media (prefers-reduced-motion: reduce) {
-    .book :global(.cover),
-    .book__inner {
-      transition: none;
+    /* Mobile: books lie on their side, stacked spine over spine */
+    @media (max-width: 749px) {
+        .shelf {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .book {
+            width: var(--spine-width);
+            margin-inline-start: var(--spine-offset);
+        }
+
+        .book :global(.cover) {
+            display: none;
+        }
+
+        .book__inner {
+            flex-flow: row wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.25rem 1rem;
+            padding: 0.75rem 1rem 0.75rem 1.25rem;
+            border-left: 0.5rem solid rgba(0, 0, 0, 0.25);
+            background-color: var(--spine-color);
+            box-shadow: var(--app-box-shadow);
+            color: var(--black);
+            text-decoration: none;
+            transition: transform var(--app-transition);
+        }
+
+        .book__inner:hover,
+        a.book__inner:focus-visible {
+            transform: translateX(0.35rem);
+        }
+
+        .book__title {
+            font-family: var(--app-font-family-headings);
+            overflow-wrap: normal;
+        }
+
+        .book__author {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
     }
-  }
+
+    @media (prefers-reduced-motion: reduce) {
+        .book :global(.cover),
+        .book__inner {
+            transition: none;
+        }
+    }
 </style>
