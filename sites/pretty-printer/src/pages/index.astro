@@ -305,6 +305,14 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
       }
 
       // ── Markdown insertion helpers ──
+      // On touch screens, focusing the editor pops open the keyboard, so leave
+      // that to the user tapping into it
+      const isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+      function focusEditor() {
+        if (!isTouch) el.editor.focus();
+      }
+
       function wrapSelection(
         before: string,
         after: string,
@@ -320,7 +328,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
           ta.selectionStart = start + before.length;
           ta.selectionEnd = start + before.length + placeholder.length;
         }
-        ta.focus();
+        focusEditor();
         updateAll();
       }
 
@@ -342,14 +350,14 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
           lineEnd === -1 ? val.length : lineEnd,
           "end",
         );
-        ta.focus();
+        focusEditor();
         updateAll();
       }
 
       function insertAtCursor(text: string) {
         const ta = el.editor;
         ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, "end");
-        ta.focus();
+        focusEditor();
         updateAll();
       }
 
@@ -703,7 +711,8 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
     color: var(--app-color);
     font: inherit;
     font-family: "JetBrains Mono Variable", monospace;
-    font-size: 0.95rem;
+    /* At least 16px, or iOS Safari zooms in when the editor is focused */
+    font-size: 1rem;
     line-height: 1.7;
     resize: none;
     white-space: pre;
@@ -1092,7 +1101,6 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
 
     textarea {
       padding: 2.5rem 3rem;
-      font-size: 1rem;
     }
 
     #preview {
