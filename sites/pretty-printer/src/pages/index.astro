@@ -580,10 +580,12 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
     flex-wrap: wrap;
   }
 
+  /* Mobile: font picker on its own row, shortcuts in an even grid below */
   .font-controls {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    flex: 1 1 100%;
   }
 
   .font-controls select {
@@ -591,12 +593,15 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
   }
 
   .style-buttons {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 0.25rem;
+    flex: 1 1 100%;
   }
 
   /* Separator between font controls and MD shortcuts */
   .toolbar-sep {
+    display: none;
     width: 1px;
     height: 1.5rem;
     background: var(--app-border);
@@ -613,6 +618,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
     font-size: 0.85rem;
     transition: all 0.2s;
     min-width: 2.2rem;
+    min-height: 2.5rem;
     color: var(--app-color);
     line-height: 1;
   }
@@ -1046,6 +1052,23 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
 
     .toolbar-row {
       flex-wrap: nowrap;
+    }
+
+    .font-controls {
+      flex: 0 0 auto;
+    }
+
+    .style-buttons {
+      display: flex;
+      flex: 0 0 auto;
+    }
+
+    .toolbar-sep {
+      display: block;
+    }
+
+    .style-btn {
+      min-height: 0;
     }
 
     /* Desktop: side-by-side split */
