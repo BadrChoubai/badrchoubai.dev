@@ -1,6 +1,7 @@
 ---
 import Header from "@badrchoubai/ui/Header.astro";
 import Footer from "@badrchoubai/ui/Footer.astro";
+import BackToTop from "@badrchoubai/ui/BackToTop.astro";
 import "@badrchoubai/ui/styles/base.css";
 import { ClientRouter } from "astro:transitions";
 
@@ -24,6 +25,7 @@ const { title, description, image, noindex } = Astro.props;
     <main class="main" id="content">
       <slot />
     </main>
+    <BackToTop bottom="5rem" />
     <Footer />
   </body>
 </html>
