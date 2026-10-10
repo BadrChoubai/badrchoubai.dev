@@ -8,9 +8,10 @@
     "sites/*"
   ],
   "scripts": {
-    "dev": "concurrently -k -n www,bookshelf -c blue,magenta \"npm:dev:www\" \"npm:dev:bookshelf\"",
+    "dev": "concurrently -k -n www,bookshelf,pretty-printer -c blue,magenta,green \"npm:dev:www\" \"npm:dev:bookshelf\" \"npm:dev:pretty-printer\"",
     "dev:www": "npm run dev -w sites/www",
     "dev:bookshelf": "npm run dev -w sites/bookshelf",
+    "dev:pretty-printer": "npm run dev -w sites/pretty-printer",
     "build": "npm run build --workspaces --if-present",
     "lint": "prettier . --write"
   },

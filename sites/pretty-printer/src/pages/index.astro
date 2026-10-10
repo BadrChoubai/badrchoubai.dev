@@ -1,0 +1,1127 @@
+---
+import "@badrchoubai/ui/styles/colors.css";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/host-grotesk";
+import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/playfair-display";
+
+const title = "Pretty Printer";
+const description =
+  "Create and share beautifully formatted text documents. Perfect for quotes, poems, and creative writing.";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="text editor, share documents, quotes, poetry, writing, markdown"
+    />
+
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#FFFFFF" />
+
+    <!-- OpenGraph -->
+    <meta property="og:title" content={title} />
+    <meta
+      property="og:description"
+      content="Create and share beautifully formatted text documents."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:type" content="image/png" />
+  </head>
+
+  <body>
+    <div id="app">
+      <!-- Toolbar -->
+      <div class="form-container">
+        <input type="text" id="title" placeholder="Title" />
+        <input type="text" id="author" placeholder="Author (optional)" />
+        <div class="toolbar-row">
+          <div class="font-controls">
+            <select id="fontSelect">
+              <option value="playfair">Playfair Display</option>
+              <option value="inter">Inter</option>
+              <option value="host_grotesk">Host Grotesk</option>
+              <option value="jetbrains_mono">JetBrains Mono</option>
+            </select>
+          </div>
+          <div class="toolbar-sep"></div>
+          <!-- Markdown shortcut buttons -->
+          <div class="style-buttons">
+            <button class="style-btn" id="mdBold" title="Bold (**text**)"
+              >B</button
+            >
+            <button class="style-btn" id="mdItalic" title="Italic (*text*)"
+              ><em>I</em></button
+            >
+            <button class="style-btn" id="mdH1" title="Heading 1">H1</button>
+            <button class="style-btn" id="mdH2" title="Heading 2">H2</button>
+            <button class="style-btn" id="mdQuote" title="Blockquote">"</button>
+            <button class="style-btn" id="mdCode" title="Inline code"
+              >&lt;/&gt;</button
+            >
+            <button class="style-btn" id="mdUl" title="Bullet list">•</button>
+            <button class="style-btn" id="mdOl" title="Numbered list">1.</button
+            >
+            <button class="style-btn" id="mdLink" title="Link">🔗</button>
+            <button class="style-btn" id="mdHr" title="Horizontal rule"
+              >—</button
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Editor / Preview -->
+      <div id="editor-container">
+        <!-- Mobile tabs -->
+        <div class="pane-header">
+          <button class="pane-tab active" id="tabEdit">Edit</button>
+          <button class="pane-tab" id="tabPreview">Preview</button>
+        </div>
+        <div class="panes">
+          <div class="pane visible" id="paneEdit">
+            <textarea
+              id="editor"
+              placeholder={`Write Markdown here…
+
+# Heading
+**bold**, *italic*, [link](https://example.com)
+> blockquote
+- bullet list`}></textarea>
+          </div>
+          <div class="pane" id="panePreview">
+            <div id="preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="copy">Share</button>
+        <button id="print">Print</button>
+        <button id="clear">Clear</button>
+      </div>
+    </div>
+
+    <!-- Print-only output -->
+    <div class="print-content" id="printContent">
+      <h1 id="contentTitle"></h1>
+      <div id="contentBody"></div>
+      <span id="contentAuthor"></span>
+    </div>
+
+    <script>
+      import { marked } from "marked";
+
+      // ── Markdown renderer setup ──
+      marked.setOptions({
+        breaks: true, // single newline → <br>
+        gfm: true,
+      });
+
+      function renderMarkdown(text: string) {
+        return marked.parse(text || "", { async: false });
+      }
+
+      // ── State ──
+      type Content = { title: string; author: string; text: string };
+
+      const state = {
+        title: "",
+        author: "",
+        text: "",
+        font: "playfair",
+      };
+
+      // ── DOM ──
+      const byId = <T extends HTMLElement = HTMLElement>(id: string) =>
+        document.getElementById(id) as T;
+
+      const el = {
+        editor: byId<HTMLTextAreaElement>("editor"),
+        title: byId<HTMLInputElement>("title"),
+        author: byId<HTMLInputElement>("author"),
+        copy: byId("copy"),
+        print: byId("print"),
+        clear: byId("clear"),
+        fontSelect: byId<HTMLSelectElement>("fontSelect"),
+        preview: byId("preview"),
+        contentTitle: byId("contentTitle"),
+        contentBody: byId("contentBody"),
+        contentAuthor: byId("contentAuthor"),
+        tabEdit: byId("tabEdit"),
+        tabPreview: byId("tabPreview"),
+        paneEdit: byId("paneEdit"),
+        panePreview: byId("panePreview"),
+        mdBold: byId("mdBold"),
+        mdItalic: byId("mdItalic"),
+        mdH1: byId("mdH1"),
+        mdH2: byId("mdH2"),
+        mdQuote: byId("mdQuote"),
+        mdCode: byId("mdCode"),
+        mdUl: byId("mdUl"),
+        mdOl: byId("mdOl"),
+        mdLink: byId("mdLink"),
+        mdHr: byId("mdHr"),
+      };
+
+      // ── Encoding: URL-safe base64 of UTF-8 text ──
+      const encoding = {
+        encode: (text: string) =>
+          btoa(unescape(encodeURIComponent(text)))
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, ""),
+        decode: (b64: string) => {
+          let s = b64.replace(/-/g, "+").replace(/_/g, "/");
+          while (s.length % 4) s += "=";
+          return decodeURIComponent(escape(atob(s)));
+        },
+      };
+
+      // ── URL state ──
+      const queryParams = {
+        parse: (): Content => {
+          const params = new URLSearchParams(window.location.search);
+          const encodedState = params.get("state");
+          if (!encodedState) return { title: "", author: "", text: "" };
+          try {
+            const parts = encodedState.split("|");
+            if (parts.length === 3)
+              return {
+                title: encoding.decode(parts[0]),
+                author: encoding.decode(parts[1]),
+                text: encoding.decode(parts[2]),
+              };
+            if (parts.length === 2)
+              return {
+                title: encoding.decode(parts[0]),
+                author: "",
+                text: encoding.decode(parts[1]),
+              };
+            return {
+              title: "",
+              author: "",
+              text: encoding.decode(encodedState),
+            };
+          } catch (e) {
+            console.warn("Failed to parse state from URL:", e);
+            return { title: "", author: "", text: "" };
+          }
+        },
+        create: ({ title, author, text }: Content) =>
+          title || author
+            ? `${encoding.encode(title)}|${encoding.encode(author)}|${encoding.encode(text)}`
+            : encoding.encode(text),
+        updateURL: (content: Content) => {
+          const stateValue = queryParams.create(content);
+          const params = new URLSearchParams([["state", stateValue]]);
+          window.history.replaceState(
+            null,
+            "",
+            `${window.location.pathname}?${params}`,
+          );
+        },
+      };
+
+      // ── Font map ──
+      const fontMap: Record<string, string> = {
+        playfair: '"Playfair Display Variable", system-ui, serif',
+        inter: '"Inter Variable", system-ui, sans-serif',
+        host_grotesk: '"Host Grotesk Variable", system-ui, sans-serif',
+        jetbrains_mono: '"JetBrains Mono Variable", system-ui, sans-serif',
+      };
+
+      // ── Update functions ──
+      function updateState() {
+        state.title = el.title.value.trim();
+        state.author = el.author.value.trim();
+        state.text = el.editor.value;
+      }
+
+      function updatePreview() {
+        const html = renderMarkdown(state.text);
+        el.preview.innerHTML =
+          html ||
+          '<p class="preview-placeholder">Preview will appear here…</p>';
+      }
+
+      function updatePrintContent() {
+        el.contentTitle.textContent = state.title;
+        el.contentBody.innerHTML = renderMarkdown(state.text);
+        el.contentAuthor.textContent = state.author ? `— ${state.author}` : "";
+      }
+
+      function setMeta(selector: string, content: string) {
+        document.querySelector<HTMLMetaElement>(selector)!.content = content;
+      }
+
+      function updateDocumentMetadata() {
+        let title = "Pretty Printer";
+        if (state.title) title += ` - ${state.title}`;
+        if (state.author) title += ` by ${state.author}`;
+        const displayTitle =
+          title.length > 60 ? title.slice(0, 57) + "..." : title;
+        // Strip markdown for description snippet
+        const plainText = state.text.replace(/[#*_`>\-\[\]!]/g, "").trim();
+        const description =
+          plainText.slice(0, 160) ||
+          "Create and share beautifully formatted text documents.";
+        document.title = title;
+        setMeta('meta[property="og:title"]', displayTitle);
+        setMeta('meta[property="og:description"]', description);
+        setMeta('meta[name="description"]', description);
+      }
+
+      function updateFontStyles() {
+        const fontFamily = fontMap[state.font] || fontMap.playfair;
+        // Preview and print body inherit via CSS custom property
+        document.documentElement.style.setProperty(
+          "--app-font-family",
+          fontFamily,
+        );
+      }
+
+      function updateAll() {
+        updateState();
+        updatePreview();
+        updatePrintContent();
+        updateDocumentMetadata();
+        updateFontStyles();
+        queryParams.updateURL(state);
+      }
+
+      // ── Markdown insertion helpers ──
+      function wrapSelection(
+        before: string,
+        after: string,
+        placeholder: string,
+      ) {
+        const ta = el.editor;
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const selected = ta.value.slice(start, end) || placeholder;
+        ta.setRangeText(before + selected + after, start, end, "select");
+        // Move cursor to just inside the wrapper if no selection
+        if (start === end) {
+          ta.selectionStart = start + before.length;
+          ta.selectionEnd = start + before.length + placeholder.length;
+        }
+        ta.focus();
+        updateAll();
+      }
+
+      function prefixLine(prefix: string) {
+        const ta = el.editor;
+        const start = ta.selectionStart;
+        const val = ta.value;
+        // Find start of current line
+        const lineStart = val.lastIndexOf("\n", start - 1) + 1;
+        const lineEnd = val.indexOf("\n", start);
+        const line = val.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+        // Toggle: remove prefix if already present, add if not
+        const newLine = line.startsWith(prefix)
+          ? line.slice(prefix.length)
+          : prefix + line;
+        ta.setRangeText(
+          newLine,
+          lineStart,
+          lineEnd === -1 ? val.length : lineEnd,
+          "end",
+        );
+        ta.focus();
+        updateAll();
+      }
+
+      function insertAtCursor(text: string) {
+        const ta = el.editor;
+        ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, "end");
+        ta.focus();
+        updateAll();
+      }
+
+      // ── Toolbar button handlers ──
+      el.mdBold.addEventListener("click", () =>
+        wrapSelection("**", "**", "bold text"),
+      );
+      el.mdItalic.addEventListener("click", () =>
+        wrapSelection("*", "*", "italic text"),
+      );
+      el.mdH1.addEventListener("click", () => prefixLine("# "));
+      el.mdH2.addEventListener("click", () => prefixLine("## "));
+      el.mdQuote.addEventListener("click", () => prefixLine("> "));
+      el.mdCode.addEventListener("click", () =>
+        wrapSelection("`", "`", "code"),
+      );
+      el.mdUl.addEventListener("click", () => prefixLine("- "));
+      el.mdOl.addEventListener("click", () => prefixLine("1. "));
+      el.mdHr.addEventListener("click", () => insertAtCursor("\n\n---\n\n"));
+      el.mdLink.addEventListener("click", () => {
+        const ta = el.editor;
+        const selected = ta.value.slice(ta.selectionStart, ta.selectionEnd);
+        if (selected) {
+          wrapSelection("[", "](https://)", selected);
+        } else {
+          wrapSelection("[link text](", ")", "https://");
+        }
+      });
+
+      // ── Mobile tabs ──
+      el.tabEdit.addEventListener("click", () => {
+        el.tabEdit.classList.add("active");
+        el.tabPreview.classList.remove("active");
+        el.paneEdit.classList.add("visible");
+        el.panePreview.classList.remove("visible");
+      });
+
+      el.tabPreview.addEventListener("click", () => {
+        el.tabPreview.classList.add("active");
+        el.tabEdit.classList.remove("active");
+        el.panePreview.classList.add("visible");
+        el.paneEdit.classList.remove("visible");
+        updatePreview();
+      });
+
+      // ── Font select ──
+      el.fontSelect.addEventListener("change", () => {
+        state.font = el.fontSelect.value;
+        updateFontStyles();
+      });
+
+      // ── Main inputs ──
+      el.editor.addEventListener("input", updateAll);
+      el.title.addEventListener("input", updateAll);
+      el.author.addEventListener("input", updateAll);
+
+      // ── Actions ──
+      function requireTitle() {
+        if (el.title.value.trim()) return true;
+        alert("Title is required to share or print.");
+        el.title.focus();
+        return false;
+      }
+
+      el.copy.addEventListener("click", () => {
+        if (!requireTitle()) return;
+        const stateValue = queryParams.create(state);
+        const params = new URLSearchParams([["state", stateValue]]);
+        const url = `${window.location.origin}${window.location.pathname}?${params}`;
+        navigator.clipboard
+          .writeText(url)
+          .then(() => alert("Share URL copied to clipboard!"));
+      });
+
+      el.clear.addEventListener("click", () => {
+        el.title.value = "";
+        el.author.value = "";
+        el.editor.value = "";
+        updateAll();
+      });
+
+      el.print.addEventListener("click", () => {
+        if (!requireTitle()) return;
+        window.print();
+      });
+
+      // ── Tab key in textarea → insert spaces ──
+      el.editor.addEventListener("keydown", (e) => {
+        if (e.key === "Tab") {
+          e.preventDefault();
+          el.editor.setRangeText(
+            "  ",
+            el.editor.selectionStart,
+            el.editor.selectionEnd,
+            "end",
+          );
+          updateAll();
+        }
+      });
+
+      // ── Init ──
+      const initial = queryParams.parse();
+      el.title.value = initial.title;
+      el.author.value = initial.author;
+      el.editor.value = initial.text;
+      updateAll();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* Palette comes from @badrchoubai/ui; these are Pretty Printer's own
+     light-first surface tokens, on top of it */
+  :root,
+  :host {
+    --app-font-family:
+      system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --app-font-weight: 400;
+    --app-font-style: normal;
+
+    --gray-600: #444444;
+    --gray-400: #e5e7eb;
+    --gray-300: #f0f0f0;
+    --gray-200: #fafaf8;
+
+    --app-bg: var(--white);
+    --app-color: var(--black);
+    --app-surface: var(--gray-200);
+    --app-border: var(--gray-400);
+    --app-accent: var(--blue);
+    --app-accent-hover: #5a8ec4;
+    --app-text-secondary: var(--gray-500);
+    --app-button-bg: var(--white);
+    --app-button-hover: var(--gray-300);
+    --app-code-bg: #f3f4f6;
+    --app-blockquote-border: var(--blue);
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  body {
+    font-family: var(--app-font-family);
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: var(--app-font-weight);
+    font-style: var(--app-font-style);
+    background: var(--app-bg);
+    color: var(--app-color);
+  }
+
+  #app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Toolbar ── */
+  .form-container {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--app-border);
+    background: var(--app-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+    flex-shrink: 0;
+  }
+
+  input[type="text"] {
+    padding: 0.5rem;
+    font-family: system-ui;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    background: var(--app-bg);
+    color: var(--app-color);
+  }
+
+  #title {
+    width: 100%;
+  }
+
+  #author {
+    width: 100%;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--app-accent);
+  }
+
+  select {
+    padding: 0.5rem;
+    font-family: system-ui;
+    font-size: 1rem;
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    background: var(--app-bg);
+    color: var(--app-color);
+    cursor: pointer;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: var(--app-accent);
+  }
+
+  .toolbar-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .font-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .font-controls select {
+    flex: 1;
+  }
+
+  .style-buttons {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  /* Separator between font controls and MD shortcuts */
+  .toolbar-sep {
+    width: 1px;
+    height: 1.5rem;
+    background: var(--app-border);
+    flex-shrink: 0;
+  }
+
+  .style-btn {
+    padding: 0.4rem 0.6rem;
+    background: var(--app-button-bg);
+    border: 1px solid var(--app-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    min-width: 2.2rem;
+    color: var(--app-color);
+    line-height: 1;
+  }
+
+  .style-btn:hover {
+    border-color: var(--app-accent);
+    background: var(--app-button-hover);
+  }
+
+  .style-btn.active {
+    background: var(--app-accent);
+    color: var(--white);
+    border-color: var(--app-accent);
+  }
+
+  /* ── Editor / Preview split ── */
+  #editor-container {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pane-header {
+    display: flex;
+    border-bottom: 1px solid var(--app-border);
+    background: var(--app-surface);
+    flex-shrink: 0;
+  }
+
+  .pane-tab {
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-text-secondary);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+  }
+
+  .pane-tab.active {
+    color: var(--app-accent);
+    border-bottom-color: var(--app-accent);
+  }
+
+  .pane-tab:hover:not(.active) {
+    color: var(--app-color);
+    background: var(--app-button-hover);
+  }
+
+  .panes {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+  }
+
+  /* Mobile: single pane, tabs switch between them */
+  .pane {
+    flex: 1;
+    overflow: auto;
+    display: none;
+  }
+
+  .pane.visible {
+    display: flex;
+    flex-direction: column;
+  }
+
+  textarea {
+    flex: 1;
+    width: 100%;
+    padding: 1.5rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--app-color);
+    font: inherit;
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    resize: none;
+    white-space: pre;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  textarea::placeholder {
+    opacity: 0.4;
+  }
+
+  /* Preview pane */
+  #preview {
+    padding: 1.5rem;
+    font-family: var(--app-font-family);
+    font-weight: var(--app-font-weight);
+    font-style: var(--app-font-style);
+  }
+
+  /* Markdown rendered styles */
+  #preview h1,
+  #preview h2,
+  #preview h3,
+  #preview h4,
+  #preview h5,
+  #preview h6 {
+    font-family: var(--app-font-family);
+    font-weight: 700;
+    margin: 1.4em 0 0.5em;
+    line-height: 1.25;
+  }
+
+  #preview h1 {
+    font-size: 2em;
+    margin-top: 0;
+  }
+
+  #preview h2 {
+    font-size: 1.5em;
+  }
+
+  #preview h3 {
+    font-size: 1.25em;
+  }
+
+  #preview p {
+    margin: 0.75em 0;
+  }
+
+  #preview a {
+    color: var(--app-accent);
+    text-decoration: underline;
+  }
+
+  #preview strong {
+    font-weight: 700;
+  }
+
+  #preview em {
+    font-style: italic;
+  }
+
+  #preview ul,
+  #preview ol {
+    padding-left: 1.5em;
+    margin: 0.75em 0;
+  }
+
+  #preview li {
+    margin: 0.3em 0;
+  }
+
+  #preview blockquote {
+    border-left: 3px solid var(--app-blockquote-border);
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    color: var(--app-text-secondary);
+    background: var(--app-surface);
+    border-radius: 0 4px 4px 0;
+  }
+
+  #preview blockquote p {
+    margin: 0;
+  }
+
+  #preview code {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.875em;
+    background: var(--app-code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+  }
+
+  #preview pre {
+    background: var(--app-code-bg);
+    border-radius: 6px;
+    padding: 1em;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+
+  #preview pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.875em;
+  }
+
+  #preview hr {
+    border: none;
+    border-top: 1px solid var(--app-border);
+    margin: 1.5em 0;
+  }
+
+  #preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+  }
+
+  #preview th,
+  #preview td {
+    border: 1px solid var(--app-border);
+    padding: 0.5em 0.75em;
+    text-align: left;
+  }
+
+  #preview th {
+    background: var(--app-surface);
+    font-weight: 600;
+  }
+
+  #preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* Empty preview placeholder */
+  .preview-placeholder {
+    color: var(--app-text-secondary);
+    opacity: 0.4;
+    font-style: italic;
+  }
+
+  /* ── Actions ── */
+  .actions {
+    border-top: solid 1px var(--app-text-secondary);
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem 0.5rem;
+    flex-shrink: 0;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    font-size: inherit;
+    font-family: "Inter Variable", var(--app-font-family);
+    cursor: pointer;
+    border: none;
+    background: var(--app-button-bg);
+    color: var(--app-accent);
+    transition: background-color 0.2s;
+    width: 100%;
+  }
+
+  #clear {
+    color: var(--red);
+  }
+
+  button:hover {
+    background: var(--app-button-hover);
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  /* ── Print content ── */
+  .print-content {
+    display: none;
+  }
+
+  #contentTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem;
+    line-height: 1.25;
+  }
+
+  #contentAuthor {
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 2rem;
+    display: block;
+    color: var(--app-text-secondary);
+  }
+
+  /* The rendered Markdown inside print */
+  #contentBody h1,
+  #contentBody h2,
+  #contentBody h3,
+  #contentBody h4,
+  #contentBody h5,
+  #contentBody h6 {
+    font-weight: 700;
+    margin: 1.2em 0 0.4em;
+    line-height: 1.25;
+  }
+
+  #contentBody h1 {
+    font-size: 1.8em;
+  }
+
+  #contentBody h2 {
+    font-size: 1.4em;
+  }
+
+  #contentBody h3 {
+    font-size: 1.2em;
+  }
+
+  #contentBody p {
+    margin: 0.75em 0;
+  }
+
+  #contentBody a {
+    color: var(--app-accent);
+  }
+
+  #contentBody strong {
+    font-weight: 700;
+  }
+
+  #contentBody em {
+    font-style: italic;
+  }
+
+  #contentBody ul,
+  #contentBody ol {
+    padding-left: 1.5em;
+    margin: 0.75em 0;
+  }
+
+  #contentBody li {
+    margin: 0.3em 0;
+  }
+
+  #contentBody blockquote {
+    border-left: 3px solid var(--app-blockquote-border);
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    color: var(--app-text-secondary);
+  }
+
+  #contentBody code {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.875em;
+    background: var(--app-code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+  }
+
+  #contentBody pre {
+    background: var(--app-code-bg);
+    border-radius: 6px;
+    padding: 1em;
+    overflow-x: auto;
+  }
+
+  #contentBody pre code {
+    background: none;
+    padding: 0;
+  }
+
+  #contentBody hr {
+    border: none;
+    border-top: 1px solid var(--app-border);
+    margin: 1.5em 0;
+  }
+
+  #contentBody table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+  }
+
+  #contentBody th,
+  #contentBody td {
+    border: 1px solid var(--app-border);
+    padding: 0.5em 0.75em;
+    text-align: left;
+  }
+
+  #contentBody th {
+    background: var(--app-surface);
+    font-weight: 600;
+  }
+
+  /* ── Dark Mode ── */
+  @media (prefers-color-scheme: dark) {
+    :root,
+    :host {
+      --app-bg: var(--gray-800);
+      --app-color: #e8e8e8;
+      --app-surface: #242424;
+      --app-border: var(--gray-700);
+      --app-accent: #5a8ec4;
+      --app-accent-hover: #6ba3d4;
+      --app-text-secondary: #999999;
+      --app-button-bg: #2a2a2a;
+      --app-button-hover: var(--gray-700);
+      --app-code-bg: #1a1a1a;
+      --app-blockquote-border: #5a8ec4;
+    }
+
+    #clear {
+      color: #ff6b5a;
+    }
+  }
+
+  /* ── Desktop ── */
+  @media screen and (min-width: 750px) {
+    .form-container {
+      padding: 0.75rem 1rem;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    #title {
+      flex: 1;
+      min-width: 200px;
+      width: auto;
+      font-size: 1.25rem;
+      padding: 0.6rem 0.75rem;
+    }
+
+    #author {
+      min-width: 150px;
+      width: auto;
+      font-size: 1.25rem;
+      padding: 0.6rem 0.75rem;
+    }
+
+    .toolbar-row {
+      flex-wrap: nowrap;
+    }
+
+    /* Desktop: side-by-side split */
+    .pane-header {
+      display: none;
+    }
+
+    .panes {
+      flex-direction: row;
+    }
+
+    .pane {
+      display: flex !important;
+      flex: 1;
+      border-right: 1px solid var(--app-border);
+    }
+
+    .pane:last-child {
+      border-right: none;
+    }
+
+    textarea {
+      padding: 2.5rem 3rem;
+      font-size: 1rem;
+    }
+
+    #preview {
+      padding: 2.5rem 3rem;
+      font-size: 1.1rem;
+    }
+
+    .actions {
+      flex-direction: row;
+      width: auto;
+    }
+
+    button {
+      width: auto;
+      padding: 0.5rem 1rem;
+    }
+
+    .font-controls select {
+      flex: 0 1 auto;
+    }
+  }
+
+  /* ── Print ── */
+  @media print {
+    html,
+    body,
+    #app,
+    #editor-container {
+      height: auto;
+      margin: 0;
+      padding: 0;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .form-container,
+    .pane-header,
+    #editor-container,
+    button,
+    .actions {
+      display: none;
+    }
+
+    .print-content {
+      display: block;
+      font: inherit;
+      line-height: inherit;
+      margin: 0;
+      padding: 0;
+    }
+  }
+</style>
