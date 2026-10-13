@@ -143,6 +143,13 @@ const shelves = [...genres]
         };
 
         input.addEventListener("input", filter);
+        // Escape leaves the field; the query and results stay put
+        input.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            // Stops Chrome and Safari clearing the field on Escape
+            event.preventDefault();
+            input.blur();
+        });
         // Browsers may restore the field's value on back/forward navigation
         if (input.value) filter();
     }
