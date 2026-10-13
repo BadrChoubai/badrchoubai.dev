@@ -155,6 +155,23 @@ const shelves = [...genres]
     }
 
     document.addEventListener("astro:page-load", initSearch);
+
+    // "/" jumps to search, as on GitHub. Registered once, outside initSearch,
+    // so client-side navigation doesn't stack up listeners.
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey)
+            return;
+        // Let "/" through when typing in a field
+        const target = event.target as HTMLElement;
+        if (target.closest("input, textarea, select, [contenteditable]")) return;
+
+        const input = document.querySelector<HTMLInputElement>(
+            "[data-book-search]",
+        );
+        if (!input) return;
+        event.preventDefault();
+        input.focus();
+    });
 </script>
 
 <style>
