@@ -56,15 +56,21 @@ const shelves = [...genres]
         </div>
         <div class="search">
             <label for="book-search" class="sr-only">Search books</label>
-            <input
-                id="book-search"
-                class="search__input"
-                type="search"
-                placeholder="Search by title or author"
-                autocomplete="off"
-                spellcheck="false"
-                data-book-search
-            />
+            <span class="search__field">
+                <input
+                    id="book-search"
+                    class="search__input"
+                    type="search"
+                    placeholder="Search by title or author"
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-keyshortcuts="/"
+                    data-book-search
+                />
+                <span class="search__hint" aria-hidden="true">
+                    Type <kbd>/</kbd> to search
+                </span>
+            </span>
             <p class="search__status" role="status" data-book-search-status>
             </p>
         </div>
@@ -182,9 +188,14 @@ const shelves = [...genres]
         gap: 0.5rem var(--app-spacing);
     }
 
-    .search__input {
+    .search__field {
+        position: relative;
         flex: 1 1 16rem;
         max-width: 32rem;
+    }
+
+    .search__input {
+        width: 100%;
         padding: 0.5rem 0.75rem;
         font: inherit;
         font-family: var(--app-font-family-monospace);
@@ -198,6 +209,37 @@ const shelves = [...genres]
     .search__input:focus-visible {
         outline: 2px solid var(--app-accent-color);
         outline-offset: 3px;
+    }
+
+    /* "Type / to search" sits in the empty field until it's focused.
+       Desktop only: touch keyboards have no use for the shortcut. */
+    .search__hint {
+        display: none;
+        position: absolute;
+        inset: 0;
+        align-items: center;
+        gap: 0.4em;
+        padding-inline: 0.75rem;
+        font-family: var(--app-font-family-monospace);
+        font-size: 0.875rem;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .search__hint kbd {
+        padding: 0.05rem 0.4rem;
+        font-size: 0.8rem;
+        border: var(--app-border-width) solid var(--app-border-color);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .search__input:placeholder-shown:not(:focus) + .search__hint {
+            display: flex;
+        }
+
+        .search__input:not(:focus)::placeholder {
+            color: transparent;
+        }
     }
 
     .search__status {
