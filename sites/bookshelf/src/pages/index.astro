@@ -5,6 +5,7 @@ import Layout from "../layouts/Layout.astro";
 import Section from "../components/Section.astro";
 import Book from "../components/Book.astro";
 import GenreNav from "../components/GenreNav.astro";
+import Search from "../components/Search.astro";
 
 type BookData = CollectionEntry<"books">["data"];
 
@@ -54,41 +55,7 @@ const shelves = [...genres]
             <p>What I've read, by genre.</p>
             <p>Total Amount of Books Read: {books.length}</p>
         </div>
-        <div class="search">
-            <label for="book-search" class="sr-only">Search books</label>
-            <span class="search__field">
-                <svg
-                    class="search__icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.67"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                    focusable="false"
-                >
-                    <circle cx="8.75" cy="8.75" r="5.42"></circle>
-                    <path d="m17.5 17.5-4.92-4.92"></path>
-                </svg>
-                <input
-                    id="book-search"
-                    class="search__input"
-                    type="search"
-                    placeholder="Search by title or author"
-                    autocomplete="off"
-                    spellcheck="false"
-                    aria-keyshortcuts="/"
-                    data-book-search
-                />
-                <span class="search__hint" aria-hidden="true">
-                    Type <kbd>/</kbd> to search
-                </span>
-            </span>
-            <p class="search__status" role="status" data-book-search-status>
-            </p>
-        </div>
+        <Search />
 
         <GenreNav {shelves} />
 
@@ -118,162 +85,7 @@ const shelves = [...genres]
     </Section>
 </Layout>
 
-<script>
-    /**
-     * Filters books by title or author as you type. While searching, the
-     * genre shelves and nav give way to a single "All Books" shelf.
-     */
-    function initSearch() {
-        const input = document.querySelector<HTMLInputElement>(
-            "[data-book-search]",
-        );
-        const status = document.querySelector<HTMLElement>(
-            "[data-book-search-status]",
-        );
-        const all = document.querySelector<HTMLElement>("[data-all-books]");
-        if (!input || !status || !all) return;
-
-        const shelves = document.querySelectorAll<HTMLElement>(
-            ".genre:not([data-all-books]), [data-genre-nav]",
-        );
-        const books = all.querySelectorAll<HTMLElement>(".book");
-
-        const filter = () => {
-            // Same normalisation as the build-time data-search text
-            const query = input.value
-                .normalize("NFD")
-                .replace(/\p{Diacritic}/gu, "")
-                .toLowerCase()
-                .trim();
-            let matches = 0;
-
-            for (const book of books) {
-                const match = book.dataset.search!.includes(query);
-                book.hidden = !match;
-                if (match) matches++;
-            }
-
-            for (const shelf of shelves) shelf.hidden = Boolean(query);
-            all.hidden = !query || matches === 0;
-
-            status.textContent = !query
-                ? ""
-                : matches === 0
-                  ? "No books match."
-                  : `${matches} of ${books.length} books`;
-        };
-
-        input.addEventListener("input", filter);
-        // Escape leaves the field; the query and results stay put
-        input.addEventListener("keydown", (event) => {
-            if (event.key !== "Escape") return;
-            // Stops Chrome and Safari clearing the field on Escape
-            event.preventDefault();
-            input.blur();
-        });
-        // Browsers may restore the field's value on back/forward navigation
-        if (input.value) filter();
-    }
-
-    document.addEventListener("astro:page-load", initSearch);
-
-    // "/" jumps to search, as on GitHub. Registered once, outside initSearch,
-    // so client-side navigation doesn't stack up listeners.
-    document.addEventListener("keydown", (event) => {
-        if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey)
-            return;
-        // Let "/" through when typing in a field
-        const target = event.target as HTMLElement;
-        if (target.closest("input, textarea, select, [contenteditable]")) return;
-
-        const input = document.querySelector<HTMLInputElement>(
-            "[data-book-search]",
-        );
-        if (!input) return;
-        event.preventDefault();
-        input.focus();
-    });
-</script>
-
 <style>
-    .search {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 0.5rem var(--app-spacing);
-    }
-
-    .search__field {
-        position: relative;
-        flex: 1 1 16rem;
-        max-width: 32rem;
-    }
-
-    .search__icon {
-        position: absolute;
-        inset-block: 0;
-        inset-inline-start: 0.75rem;
-        width: 1rem;
-        height: 100%;
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    .search__input {
-        width: 100%;
-        padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-        font: inherit;
-        font-family: var(--app-font-family-monospace);
-        font-size: 0.875rem;
-        color: var(--app-color);
-        background-color: var(--app-background-color);
-        border: var(--app-border-width) solid var(--app-border-color);
-        border-radius: var(--app-border-radius);
-    }
-
-    .search__input:focus-visible {
-        outline: 2px solid var(--app-accent-color);
-        outline-offset: 3px;
-    }
-
-    /* "Type / to search" sits in the empty field until it's focused.
-       Desktop only: touch keyboards have no use for the shortcut. */
-    .search__hint {
-        display: none;
-        position: absolute;
-        inset: 0;
-        align-items: center;
-        gap: 0.4em;
-        padding-inline: 2.25rem 0.75rem;
-        font-family: var(--app-font-family-monospace);
-        font-size: 0.875rem;
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    .search__hint kbd {
-        padding: 0.05rem 0.4rem;
-        font-size: 0.8rem;
-        border: var(--app-border-width) solid var(--app-border-color);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-        .search__input:placeholder-shown:not(:focus) + .search__hint {
-            display: flex;
-        }
-
-        .search__input:not(:focus)::placeholder {
-            color: transparent;
-        }
-    }
-
-    .search__status {
-        margin: 0;
-        font-family: var(--app-font-family-monospace);
-        font-size: 0.875rem;
-        opacity: 0.75;
-    }
-
     /* Global section styles set display, which beats [hidden] */
     .genre[hidden] {
         display: none;
