@@ -147,7 +147,8 @@
     padding: 0.5rem 0.75rem 0.5rem 2.25rem;
     font: inherit;
     font-family: var(--app-font-family-monospace);
-    font-size: 0.875rem;
+    /* iOS Safari zooms into fields set below 16px on focus */
+    font-size: 1rem;
     color: var(--app-color);
     background-color: var(--app-background-color);
     border: var(--app-border-width) solid var(--app-border-color);
@@ -181,6 +182,10 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
+    .search__input {
+      font-size: 0.875rem;
+    }
+
     .search__input:placeholder-shown:not(:focus) + .search__hint {
       display: flex;
     }
