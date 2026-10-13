@@ -3,16 +3,17 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import { genres } from "../genres";
 import Layout from "../layouts/Layout.astro";
 import Section from "../components/Section.astro";
-import BookCover from "../components/BookCover.astro";
+import Book from "../components/Book.astro";
 import GenreNav from "../components/GenreNav.astro";
+import Search from "../components/Search.astro";
 
-type Book = CollectionEntry<"books">["data"];
+type BookData = CollectionEntry<"books">["data"];
 
 /**
  * Catalogue heading for the first-listed author, inverted library-style:
  * "Kurt Vonnegut Jr." -> "Vonnegut, Kurt".
  */
-const heading = ({ author, authorSort }: Book) => {
+const heading = ({ author, authorSort }: BookData) => {
     if (authorSort) return authorSort;
     const names = author
         .split("&")[0]
@@ -24,7 +25,7 @@ const heading = ({ author, authorSort }: Book) => {
 };
 
 /** Titles file without a leading article: "The Fall" under "Fall". */
-const filingTitle = ({ title }: Book) => title.replace(/^(a|an|the)\s+/i, "");
+const filingTitle = ({ title }: BookData) => title.replace(/^(a|an|the)\s+/i, "");
 
 // Word-by-word, ignoring case and diacritics ("Endō" files as "Endo")
 const { compare } = new Intl.Collator("en", {
@@ -32,27 +33,11 @@ const { compare } = new Intl.Collator("en", {
     numeric: true,
 });
 
-/**
- * Stable per-book jitter in [0, 1) so the mobile stack looks hand-placed
- * but renders the same on every build.
- */
-const jitter = (seed: string) => {
-    let hash = 0;
-    for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) | 0;
-    return (Math.abs(hash) % 1000) / 1000;
-};
-
-/** Spine width and indent for a book lying on its side (mobile). */
-const spineStyle = ({ title, color }: Book) => {
-    const width = 90 + jitter(title) * 10;
-    const offset = jitter(title.split("").reverse().join("")) * (100 - width);
-    return `--spine-color: ${color}; --spine-width: ${width.toFixed(1)}%; --spine-offset: ${offset.toFixed(1)}%;`;
-};
-
-const byAuthor = (a: Book, b: Book) =>
+const byAuthor = (a: BookData, b: BookData) =>
     compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
 
 const books = (await getCollection("books")).map(({ data }) => data);
+const allBooks = [...books].sort(byAuthor);
 const shelves = [...genres]
     .sort(compare)
     .map((genre) => ({
@@ -70,6 +55,7 @@ const shelves = [...genres]
             <p>What I've read, by genre.</p>
             <p>Total Amount of Books Read: {books.length}</p>
         </div>
+        <Search />
 
         <GenreNav {shelves} />
 
@@ -84,37 +70,27 @@ const shelves = [...genres]
                         </span>
                     </h2>
                     <ul class="shelf" role="list">
-                        {books.map((book) => {
-                            const Tag = book.link ? "a" : "div";
-                            return (
-                                <li class="book" style={spineStyle(book)}>
-                                    <Tag
-                                        class="book__inner"
-                                        {...(book.link && {
-                                            href: book.link,
-                                            target: "_blank",
-                                            rel: "noopener noreferrer",
-                                        })}
-                                    >
-                                        <BookCover book={book} />
-                                        <span class="book__title">
-                                            {book.title}
-                                        </span>
-                                        <span class="book__author">
-                                            {book.author}
-                                        </span>
-                                    </Tag>
-                                </li>
-                            );
-                        })}
+                        {books.map((book) => <Book {book} />)}
                     </ul>
                 </section>
             ))
         }
+
+        <section class="genre" aria-labelledby="all-books" hidden data-all-books>
+            <h2 id="all-books">All Books</h2>
+            <ul class="shelf" role="list">
+                {allBooks.map((book) => <Book {book} />)}
+            </ul>
+        </section>
     </Section>
 </Layout>
 
 <style>
+    /* Global section styles set display, which beats [hidden] */
+    .genre[hidden] {
+        display: none;
+    }
+
     /* Genre shelves keep the global section divider, not its side padding */
     .genre {
         padding-inline: 0;
@@ -138,93 +114,12 @@ const shelves = [...genres]
         list-style: none;
     }
 
-    .book {
-        margin: 0;
-        list-style: none;
-    }
-
-    .book__inner {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .book :global(.cover) {
-        transition: transform var(--app-transition);
-    }
-
-    .book__inner:hover :global(.cover),
-    a.book__inner:focus-visible :global(.cover) {
-        transform: translateY(-0.35rem);
-    }
-
-    a.book__inner:focus-visible {
-        outline: 2px solid var(--app-accent-color);
-        outline-offset: 3px;
-    }
-
-    .book__title {
-        font-weight: 700;
-        line-height: 1.2;
-    }
-
-    .book__author {
-        font-family: var(--app-font-family-monospace);
-        font-size: 0.75rem;
-        opacity: 0.75;
-    }
-
     /* Mobile: books lie on their side, stacked spine over spine */
     @media (max-width: 749px) {
         .shelf {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
-        }
-
-        .book {
-            width: var(--spine-width);
-            margin-inline-start: var(--spine-offset);
-        }
-
-        .book :global(.cover) {
-            display: none;
-        }
-
-        .book__inner {
-            flex-flow: row wrap;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 0.25rem 1rem;
-            padding: 0.75rem 1rem 0.75rem 1.25rem;
-            border-left: 0.5rem solid rgba(0, 0, 0, 0.25);
-            background-color: var(--spine-color);
-            box-shadow: var(--app-box-shadow);
-            color: var(--black);
-            text-decoration: none;
-            transition: transform var(--app-transition);
-        }
-
-        .book__inner:hover,
-        a.book__inner:focus-visible {
-            transform: translateX(0.35rem);
-        }
-
-        .book__title {
-            font-family: var(--app-font-family-headings);
-            overflow-wrap: normal;
-        }
-
-        .book__author {
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .book :global(.cover),
-        .book__inner {
-            transition: none;
         }
     }
 </style>

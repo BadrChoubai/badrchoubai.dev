@@ -1,0 +1,134 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BookCover from "./BookCover.astro";
+
+interface Props {
+  book: CollectionEntry<"books">["data"];
+}
+
+const { book } = Astro.props;
+
+/**
+ * Stable per-book jitter in [0, 1) so the mobile stack looks hand-placed
+ * but renders the same on every build.
+ */
+const jitter = (seed: string) => {
+  let hash = 0;
+  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+  return (Math.abs(hash) % 1000) / 1000;
+};
+
+/** Spine width and indent for a book lying on its side (mobile). */
+const width = 90 + jitter(book.title) * 10;
+const offset = jitter(book.title.split("").reverse().join("")) * (100 - width);
+const spineStyle = `--spine-color: ${book.color}; --spine-width: ${width.toFixed(1)}%; --spine-offset: ${offset.toFixed(1)}%;`;
+
+/** Lowercased title and author with diacritics stripped, for the search filter. */
+const searchText = `${book.title} ${book.author}`
+  .normalize("NFD")
+  .replace(/\p{Diacritic}/gu, "")
+  .toLowerCase();
+
+const Tag = book.link ? "a" : "div";
+---
+
+<li class="book" style={spineStyle} data-search={searchText}>
+  <Tag
+    class="book__inner"
+    {...book.link && {
+      href: book.link,
+      target: "_blank",
+      rel: "noopener noreferrer",
+    }}
+  >
+    <BookCover {book} />
+    <span class="book__title">{book.title}</span>
+    <span class="book__author">{book.author}</span>
+  </Tag>
+</li>
+
+<style>
+  .book {
+    margin: 0;
+    list-style: none;
+  }
+
+  .book__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .book :global(.cover) {
+    transition: transform var(--app-transition);
+  }
+
+  .book__inner:hover :global(.cover),
+  a.book__inner:focus-visible :global(.cover) {
+    transform: translateY(-0.35rem);
+  }
+
+  a.book__inner:focus-visible {
+    outline: 2px solid var(--app-accent-color);
+    outline-offset: 3px;
+  }
+
+  .book__title {
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .book__author {
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+
+  /* Mobile: books lie on their side, stacked spine over spine */
+  @media (max-width: 749px) {
+    .book {
+      width: var(--spine-width);
+      margin-inline-start: var(--spine-offset);
+    }
+
+    .book :global(.cover) {
+      display: none;
+    }
+
+    .book__inner {
+      flex-flow: row wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.25rem 1rem;
+      padding: 0.75rem 1rem 0.75rem 1.25rem;
+      border-left: 0.5rem solid rgba(0, 0, 0, 0.25);
+      background-color: var(--spine-color);
+      box-shadow: var(--app-box-shadow);
+      color: var(--black);
+      text-decoration: none;
+      transition: transform var(--app-transition);
+    }
+
+    .book__inner:hover,
+    a.book__inner:focus-visible {
+      transform: translateX(0.35rem);
+    }
+
+    .book__title {
+      font-family: var(--app-font-family-headings);
+      overflow-wrap: normal;
+    }
+
+    .book__author {
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book :global(.cover),
+    .book__inner {
+      transition: none;
+    }
+  }
+</style>
