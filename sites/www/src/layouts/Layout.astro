@@ -20,17 +20,12 @@ const { title, description, image, noindex } = Astro.props;
     <a href="#content" class="btn primary sm sr-only skip-link"
       >Skip to main content</a
     >
-    <Header />
-    <main class="main" id="content">
-      <slot />
-    </main>
-    <Footer />
+    <div class="frame">
+      <Header />
+      <main id="content">
+        <slot />
+      </main>
+      <Footer />
+    </div>
   </body>
 </html>
-
-<style>
-  .main {
-    border-top: var(--app-border-width) solid var(--app-border-color);
-    border-bottom: var(--app-border-width) solid var(--app-border-color);
-  }
-</style>

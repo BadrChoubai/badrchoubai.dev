@@ -18,6 +18,8 @@
   /* Borders & shape */
   --app-border-radius: 0;
   --app-border-width: 2px;
+  --app-rule-width: 1px;
+  --app-rail-gutter: 0px;
 
   /* Motion */
   --app-transition: 0.2s ease-in-out;
@@ -44,8 +46,8 @@ body {
   min-height: 100svh;
 }
 
-body > header,
-body > footer {
+.frame > header,
+.frame > footer {
   padding-inline: var(--app-block-spacing-horizontal);
 }
 
@@ -92,7 +94,7 @@ ul li {
    ========================================================= */
 section {
   padding: var(--app-spacing);
-  border-bottom: var(--app-border-width) solid var(--app-border-color);
+  border-bottom: var(--app-rule-width) solid var(--app-rule-color);
   background-color: var(--app-background-color);
   color: var(--app-color);
   position: relative;
@@ -121,17 +123,65 @@ a {
 }
 
 /* =========================================================
-   Layout: container
+   Layout: frame & container
    ========================================================= */
 .container {
   width: var(--app-container-width);
   margin-inline: auto;
 }
 
+/*
+ * The frame wraps header, main and footer. On wider screens it draws two
+ * rails a side, an empty gutter between them, and top-level dividers run
+ * through the gutter to the outer rail.
+ */
+.frame {
+  position: relative;
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: var(--app-container-max);
+  margin-inline: auto;
+  padding-inline: var(--app-rail-gutter);
+}
+
+.frame > header,
+.frame > main > section {
+  position: relative;
+}
+
+.frame > main > section {
+  border-bottom: none;
+}
+
+.frame > header::after,
+.frame > main > section::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  inset-inline: calc(-1 * var(--app-rail-gutter));
+  border-bottom: var(--app-rule-width) solid var(--app-rule-color);
+  pointer-events: none;
+}
+
 @media (min-width: 750px) {
-  .container {
-    max-width: var(--app-container-max);
-    border-inline: var(--app-border-width) solid var(--app-border-color);
+  :root,
+  :host {
+    --app-rail-gutter: clamp(1.5rem, 5vw, 4rem);
+  }
+
+  /* Outer rails */
+  .frame {
+    border-inline: var(--app-rule-width) solid var(--app-rule-color);
+  }
+
+  /* Inner rails, drawn in the gutter so section backgrounds can't cover them */
+  .frame::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline: calc(var(--app-rail-gutter) - var(--app-rule-width));
+    border-inline: var(--app-rule-width) solid var(--app-rule-color);
+    pointer-events: none;
   }
 }
 

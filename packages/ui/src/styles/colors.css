@@ -25,6 +25,8 @@
   --app-background-color: var(--gray-800);
   --app-color: var(--white);
   --app-border-color: var(--gray-500);
+  /* Layout rules (rails, section dividers): quieter than component borders */
+  --app-rule-color: rgba(255, 255, 255, 0.2);
 
   /* =========================================================
        Accent colors
