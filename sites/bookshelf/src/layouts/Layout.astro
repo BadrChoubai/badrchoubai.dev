@@ -21,18 +21,13 @@ const { title, description, image, noindex } = Astro.props;
     <a href="#content" class="btn primary sm sr-only skip-link"
       >Skip to main content</a
     >
-    <Header title="Bookshelf" />
-    <main class="main" id="content">
-      <slot />
-    </main>
+    <div class="frame">
+      <Header title="Bookshelf" />
+      <main id="content">
+        <slot />
+      </main>
+      <Footer backToTop={false} />
+    </div>
     <BackToTop bottom="5rem" />
-    <Footer backToTop={false} />
   </body>
 </html>
-
-<style>
-  .main {
-    border-top: var(--app-border-width) solid var(--app-border-color);
-    border-bottom: var(--app-border-width) solid var(--app-border-color);
-  }
-</style>
