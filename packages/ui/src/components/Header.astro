@@ -1,21 +1,10 @@
 ---
-import { links } from "../links";
-
 interface Props {
   /** Names the site in the logo link's label, e.g. "Bookshelf" */
   title?: string;
 }
 
 const { title = "Badr Choubai" } = Astro.props;
-
-const isCurrent = (href: string) => {
-  const url = new URL(href);
-  return (
-    !url.hash &&
-    url.origin === Astro.url.origin &&
-    url.pathname === Astro.url.pathname
-  );
-};
 ---
 
 <header id="header" class="container">
@@ -44,16 +33,9 @@ const isCurrent = (href: string) => {
       <span class="menu-toggle__icon" aria-hidden="true"></span>
       menu
     </button>
+    <!-- The site passes its menu items in as <li>s -->
     <ul id="site-menu">
-      {
-        links.map(({ label, href }) => (
-          <li>
-            <a {href} aria-current={isCurrent(href) ? "page" : undefined}>
-              {label}
-            </a>
-          </li>
-        ))
-      }
+      <slot />
     </ul>
   </nav>
 </header>
@@ -241,12 +223,12 @@ const isCurrent = (href: string) => {
       display: none;
     }
 
-    #header[data-menu] #site-menu li {
+    #header[data-menu] #site-menu :global(li) {
       padding: 0;
     }
 
     /* Full-width rows make for easy tap targets */
-    #header[data-menu] #site-menu a {
+    #header[data-menu] #site-menu :global(a) {
       display: block;
       padding: 0.75rem 0;
     }
