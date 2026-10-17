@@ -21,11 +21,60 @@ const { title, description, image, noindex } = Astro.props;
       >Skip to main content</a
     >
     <div class="frame">
-      <Header />
+      <Header>
+        <li><a href="https://badrchoubai.dev/">home</a></li>
+        <li><a href="https://badrchoubai.dev/#projects">projects</a></li>
+        <li><a href="https://bookshelf.badrchoubai.dev/">bookshelf</a></li>
+      </Header>
       <main id="content">
         <slot />
       </main>
-      <Footer />
+      <Footer>
+        <div>
+          <h3>Online</h3>
+          <nav aria-label="Online">
+            <ul>
+              <li><a href="https://badrchoubai.dev/">home</a></li>
+              <li>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.github.com/BadrChoubai">github</a
+                >
+              </li>
+              <li>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.linkedin.com/in/BadrChoubai">linkedin</a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div>
+          <h3>Offline</h3>
+          <nav aria-label="Offline">
+            <ul>
+              <li>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.strava.com/athletes/101721008">strava</a
+                >
+              </li>
+              <li>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://open.spotify.com/user/qvo0hw19xy5khwaoanfo27fu7"
+                  >spotify</a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </Footer>
     </div>
   </body>
 </html>

@@ -9,51 +9,12 @@ const { backToTop = true } = Astro.props;
 
 <footer class="site-footer" id="footer">
   <div class="container">
+    <!--
+      Each child the site passes in is a column: a heading and a nav of
+      links, or anything else, like a newsletter signup
+    -->
     <div class="site-footer__inner">
-      <div class="site-footer__column">
-        <h3>Online</h3>
-        <nav>
-          <ul>
-            <li><a href="https://badrchoubai.dev/">home</a></li>
-            <li>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.github.com/BadrChoubai">github</a
-              >
-            </li>
-            <li>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.linkedin.com/in/BadrChoubai">linkedin</a
-              >
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <div class="site-footer__column">
-        <h3>Offline</h3>
-        <nav>
-          <ul>
-            <li>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.strava.com/athletes/101721008">strava</a
-              >
-            </li>
-            <li>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://open.spotify.com/user/qvo0hw19xy5khwaoanfo27fu7"
-                >spotify</a
-              >
-            </li>
-          </ul>
-        </nav>
-      </div>
+      <slot />
     </div>
 
     <div class="site-footer__bottom">
@@ -64,32 +25,43 @@ const { backToTop = true } = Astro.props;
 </footer>
 
 <style>
+  /*
+   * The columns are the site's markup, rendered outside this component's
+   * scope, so the rules that reach into them use :global()
+   */
   .site-footer__inner {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--app-spacing);
   }
 
-  .site-footer__column {
+  /* Four or more columns share the row evenly */
+  .site-footer__inner:has(> :nth-child(4)) {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+
+  .site-footer__inner > :global(*) {
     margin: 1rem 0;
     padding-inline: var(--app-block-spacing-horizontal);
   }
 
-  ul {
+  .site-footer__inner :global(ul) {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
 
-    li {
-      padding: 0;
-    }
+  .site-footer__inner :global(li) {
+    padding: 0;
   }
 
   /* Plain links; thin orange underline slides in on hover/focus */
-  .site-footer a {
+  .site-footer :global(a) {
     text-decoration: none;
     background-image: linear-gradient(
       var(--accent, #d9680f),
@@ -101,12 +73,12 @@ const { backToTop = true } = Astro.props;
     transition: background-size 0.2s ease;
   }
 
-  .site-footer a:hover,
-  .site-footer a:focus-visible {
+  .site-footer :global(a:hover),
+  .site-footer :global(a:focus-visible) {
     background-size: 100% 1px;
   }
 
-  .site-footer a:focus-visible {
+  .site-footer :global(a:focus-visible) {
     outline: 2px solid var(--accent, #d9680f);
     outline-offset: 3px;
   }
@@ -123,14 +95,16 @@ const { backToTop = true } = Astro.props;
   }
 
   @media screen and (max-width: 749px) {
-    .site-footer__inner {
+    .site-footer__inner,
+    .site-footer__inner:has(> :nth-child(4)) {
       grid-template-columns: 1fr;
+      grid-auto-flow: row;
       gap: 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .site-footer a {
+    .site-footer :global(a) {
       transition: none;
     }
   }
