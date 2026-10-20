@@ -14,112 +14,114 @@ type BookData = CollectionEntry<"books">["data"];
  * "Kurt Vonnegut Jr." -> "Vonnegut, Kurt".
  */
 const heading = ({ author, authorSort }: BookData) => {
-    if (authorSort) return authorSort;
-    const names = author
-        .split("&")[0]
-        .trim()
-        .replace(/,?\s+(Jr|Sr)\.?$/, "")
-        .split(/\s+/);
-    const surname = names.pop()!;
-    return `${surname}, ${names.join(" ")}`;
+  if (authorSort) return authorSort;
+  const names = author
+    .split("&")[0]
+    .trim()
+    .replace(/,?\s+(Jr|Sr)\.?$/, "")
+    .split(/\s+/);
+  const surname = names.pop()!;
+  return `${surname}, ${names.join(" ")}`;
 };
 
 /** Titles file without a leading article: "The Fall" under "Fall". */
-const filingTitle = ({ title }: BookData) => title.replace(/^(a|an|the)\s+/i, "");
+const filingTitle = ({ title }: BookData) =>
+  title.replace(/^(a|an|the)\s+/i, "");
 
 // Word-by-word, ignoring case and diacritics ("Endō" files as "Endo")
 const { compare } = new Intl.Collator("en", {
-    sensitivity: "base",
-    numeric: true,
+  sensitivity: "base",
+  numeric: true,
 });
 
 const byAuthor = (a: BookData, b: BookData) =>
-    compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
+  compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
 
 const books = (await getCollection("books")).map(({ data }) => data);
 const allBooks = [...books].sort(byAuthor);
 const shelves = [...genres]
-    .sort(compare)
-    .map((genre) => ({
-        genre,
-        id: genre.toLowerCase().replace(/[^a-z]+/g, "-"),
-        books: books.filter((book) => book.genre === genre).sort(byAuthor),
-    }))
-    .filter((shelf) => shelf.books.length > 0);
+  .sort(compare)
+  .map((genre) => ({
+    genre,
+    id: genre.toLowerCase().replace(/[^a-z]+/g, "-"),
+    books: books.filter((book) => book.genre === genre).sort(byAuthor),
+  }))
+  .filter((shelf) => shelf.books.length > 0);
 ---
 
 <Layout title="Bookshelf" description="What I've Read.">
-    <Section class="section" id="shelf">
-        <div class="group">
-            <h1>Bookshelf</h1>
-            <p>What I've read, by genre.</p>
-            <p>Total Amount of Books Read: {books.length}</p>
-        </div>
-        <Search />
+  <Section class="section" id="shelf">
+    <div class="group">
+      <h1>Bookshelf</h1>
+      <p>What I've read, by genre.</p>
+      <p>Total Amount of Books Read: {books.length}</p>
+    </div>
+    <Search />
 
-        <GenreNav {shelves} />
+    <GenreNav {shelves} />
 
-        {
-            shelves.map(({ genre, id, books }) => (
-                <section class="genre" aria-labelledby={id}>
-                    <h2 id={id}>
-                        {genre}{" "}
-                        <span class="genre__count">
-                            {books.length}{" "}
-                            {books.length === 1 ? "book" : "books"}
-                        </span>
-                    </h2>
-                    <ul class="shelf" role="list">
-                        {books.map((book) => <Book {book} />)}
-                    </ul>
-                </section>
-            ))
-        }
-
-        <section class="genre" aria-labelledby="all-books" hidden data-all-books>
-            <h2 id="all-books">All Books</h2>
-            <ul class="shelf" role="list">
-                {allBooks.map((book) => <Book {book} />)}
-            </ul>
+    {
+      shelves.map(({ genre, id, books }) => (
+        <section class="genre" aria-labelledby={id}>
+          <h2 id={id}>
+            {genre}{" "}
+            <span class="genre__count">
+              {books.length} {books.length === 1 ? "book" : "books"}
+            </span>
+          </h2>
+          <ul class="shelf" role="list">
+            {books.map((book) => (
+              <Book {book} />
+            ))}
+          </ul>
         </section>
-    </Section>
+      ))
+    }
+
+    <section class="genre" aria-labelledby="all-books" hidden data-all-books>
+      <h2 id="all-books">All Books</h2>
+      <ul class="shelf" role="list">
+        {allBooks.map((book) => <Book {book} />)}
+      </ul>
+    </section>
+  </Section>
 </Layout>
 
 <style>
-    /* Global section styles set display, which beats [hidden] */
-    .genre[hidden] {
-        display: none;
-    }
+  /* Global section styles set display, which beats [hidden] */
+  .genre[hidden] {
+    display: none;
+  }
 
-    /* Genre shelves keep the global section divider, not its side padding */
-    .genre {
-        padding-inline: 0;
-        padding-block: var(--app-spacing) calc(var(--app-spacing) * 2);
-    }
+  /* Genre shelves keep the global section divider, not its side padding */
+  .genre {
+    padding-inline: 0;
+    padding-block: var(--app-spacing) calc(var(--app-spacing) * 2);
+  }
 
-    .genre__count {
-        font-family: var(--app-font-family-monospace);
-        font-size: 0.875rem;
-        font-weight: 400;
-        white-space: nowrap;
-        opacity: 0.75;
-    }
+  .genre__count {
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.875rem;
+    font-weight: 400;
+    white-space: nowrap;
+    opacity: 0.75;
+  }
 
+  .shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: calc(var(--app-spacing) * 2) var(--app-spacing);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Mobile: books lie on their side, stacked spine over spine */
+  @media (max-width: 749px) {
     .shelf {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-        gap: calc(var(--app-spacing) * 2) var(--app-spacing);
-        margin: 0;
-        padding: 0;
-        list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
     }
-
-    /* Mobile: books lie on their side, stacked spine over spine */
-    @media (max-width: 749px) {
-        .shelf {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-    }
+  }
 </style>
