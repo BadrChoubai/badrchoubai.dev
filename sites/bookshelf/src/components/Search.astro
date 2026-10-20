@@ -47,9 +47,8 @@
    * genre shelves and nav give way to a single "All Books" shelf.
    */
   function initSearch() {
-    const input = document.querySelector<HTMLInputElement>(
-      "[data-book-search]",
-    );
+    const input =
+      document.querySelector<HTMLInputElement>("[data-book-search]");
     const status = document.querySelector<HTMLElement>(
       "[data-book-search-status]",
     );
@@ -109,9 +108,8 @@
     const target = event.target as HTMLElement;
     if (target.closest("input, textarea, select, [contenteditable]")) return;
 
-    const input = document.querySelector<HTMLInputElement>(
-      "[data-book-search]",
-    );
+    const input =
+      document.querySelector<HTMLInputElement>("[data-book-search]");
     if (!input) return;
     event.preventDefault();
     input.focus();

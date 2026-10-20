@@ -4,4 +4,3 @@ author: Cal Newport
 genre: Self-Improvement
 color: "#e96b30"
 ---
-
