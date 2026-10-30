@@ -7,7 +7,15 @@ color: "#5b8fd6"
 
 ## Chapter One: The Path to Disaster
 
+### The Product Development Model
+
 ![](../../assets/notes/the-four-steps-to-the-epiphany/Screen_Shot_2021-04-21_at_3.06.00_PM.png)
+
+The Product Development Model mapped out similarly to the one shown, is meant to help a company bring a new product into an existing market. This helps a company tailor the Product Development activities—the steps involved in bringing a product from concept or idea through market release—they do this through successive refinements to the product based on customer and market requirements. And they are doing this within a known competitive environment.
+
+This traditional model orients itself on "first customer ship date," and is a linear process, moving from one step to the next, this forces sales and marketing to work backwards from a pre-determined release date, which by then is too late for the startup to discover that their early customers don't scale into a mainstream market. This happens because this model also fails to establish any meaningful milestones for non-engineering activities.
+
+The meaning of requirements and specifications documents, implementation, and A/B Testing, and first customer ship are most obvious to engineering teams. Conversely, Sales and Marketing activities before first customer ship are absent any measurable, concrete activities, lacking any ways to stop and fix what's broken. If they have set in place any means to discover what is broken, or how to stop it at all.
 
 ### Problems With the Product Development Model
 
@@ -33,11 +41,19 @@ The Product Development Model focuses on building and shipping, not on the proce
 
 ## Chapter Two: The Path to Epiphany
 
+### The Customer Development Model
+
 ![](../../assets/notes/the-four-steps-to-the-epiphany/Screen_Shot_2021-04-21_at_3.09.16_PM.png)
 
-![The OODA Loop — John Boyd](../../assets/notes/the-four-steps-to-the-epiphany/OODA-Loop.png)
+The Customer Development Model helps a startup learn about and discover who their initial customers will be, and what markets they are in. This requires a separate and distinct process from Product Development. This model is split into two parts, one part: Search and, one part: Execution. Its goal is to eventually synchronize a startup's Product Development and Customer Development processes.
 
-The OODA Loop — John Boyd
+#### The First Part
+
+Customer Discover and Customer Validation, part of our Search process is focused on the testing and development of a business model. This ensures that a company does not build its Non-Product Development teams (sales, market, business development) until it has proof in hand that it has a valid business model.
+
+#### The Second Part
+
+Customer Creation and Company Building, part of the Execution process is focused on taking what we learned in our Search process and creating and driving end-user demand. From this, the company is now able to transition the organization to one that can execute on the ideas produced from its learnings.
 
 ### The Four Steps To The Epiphany
 
@@ -102,6 +118,21 @@ A new market results when a company creates a large customer base that couldn't 
 **Bad News:** The users and the market are undefined and unknown.
 
 Creating a new market requires you to understand whether there is a large customer base that couldn't do this before, whether these customers they want or need your new product, and whether customer adoption occurs in your lifetime. It also requires sophisticated thinking about financing—how you manage the cash-burn rate during the adoption phase, and how you manage and find investors who are patient and have deep pockets.
+
+#### Startup Market Type
+
+One of the most important considerations to make as a startup is where you're trying to fit yourself into the market. As a company follow the Customer Development process the importance of Market Type will grow, the pace at which you move through the process also depends largely on it. The table below sums up the differences among market types.
+
+- A startup that wants to bring a new product into an existing market, or a new product to a new market. Apple and Facebook are examples of two companies that have done this very successfully.
+- A startup that wants to re-segment a market, either as a low-cost entrant or as a niche player. Disney+ is an example of the latter, coming into streaming media with a price of $6.99/month.
+
+|             | Existing Market     | Resegmented Market                                                 | New Market                                                   |
+| ----------- | ------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Customers   | Existing            | Existing                                                           | New/New usage                                                |
+| Customer Needs | Performance      | 1. Cost<br>2. Perceived need                                       | Simplicity & convenience                                     |
+| Performance | Better/faster       | 1. Good enough at the low end<br>2. Good enough for new niche      | Low in "traditional attributes", improved by new customer metrics |
+| Competition | Existing incumbents | Existing incumbents                                                | Non-consumption / other startups                             |
+| Risks       | Existing incumbents | 1. Existing incumbents<br>2. Niche strategy fails                  | Market adoption                                              |
 
 > 💡 As a company follows the Customer Development process the importance of Market Type grows in each step.
 
@@ -284,4 +315,4 @@ The total cost of ownership (TCO) adoption analysis estimates the total cost to 
 
 While the Customer Development team prepares this estimate, the Product Development team should provide feedback about whether the estimates are realistic.
 
-[https://www.youtube.com/watch?v=agODxEd43Q0](https://www.youtube.com/watch?v=agODxEd43Q0)
+Watch: [Steve Blank on "Don't Waste A Good Crisis" (The NFX Podcast)](https://www.youtube.com/watch?v=agODxEd43Q0)
