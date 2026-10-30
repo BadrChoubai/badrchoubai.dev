@@ -1,0 +1,224 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Section from "../../components/Section.astro";
+import BookCover from "../../components/BookCover.astro";
+
+// Only books with notes in their Markdown body get a page
+export async function getStaticPaths() {
+  const books = await getCollection("books", ({ body }) => !!body?.trim());
+  return books.map((book) => ({ params: { id: book.id }, props: { book } }));
+}
+
+interface Props {
+  book: CollectionEntry<"books">;
+}
+
+const { book } = Astro.props;
+const { data } = book;
+const { Content } = await render(book);
+---
+
+<Layout title={data.title} description={`Notes on ${data.title}`}>
+  <Section class="section" id="notes">
+    <article class="notes">
+      <a class="notes__back" href="/">&larr; Bookshelf</a>
+      <header class="notes__header">
+        <div class="notes__cover">
+          <BookCover book={data} width={160} />
+        </div>
+        <div class="notes__meta">
+          <h1>{data.title}</h1>
+          <p class="notes__author">{data.author}</p>
+          {
+            data.link && (
+              <a
+                class="notes__link"
+                href={data.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                About the book
+              </a>
+            )
+          }
+        </div>
+      </header>
+      <div class="notes__body">
+        <Content />
+      </div>
+    </article>
+  </Section>
+</Layout>
+
+<style>
+  /* One reading column; type scales gently with the viewport, ~17px on
+     phones up to ~19px on laptops and wider */
+  .notes {
+    --notes-measure: 100ch;
+    width: 100%;
+    max-width: var(--notes-measure);
+    margin-inline: auto;
+    padding-block: var(--app-spacing) calc(var(--app-spacing) * 3);
+    font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.1875rem);
+    line-height: 1.7;
+  }
+
+  .notes__back,
+  .notes__author,
+  .notes__link {
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.8125em;
+  }
+
+  /* Cover sits beside the title instead of claiming a column */
+  .notes__header {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(var(--app-spacing) * 1.5);
+    margin-block: calc(var(--app-spacing) * 1.5) calc(var(--app-spacing) * 2.5);
+    padding-bottom: calc(var(--app-spacing) * 2);
+    border-bottom: var(--app-rule-width) solid var(--app-rule-color);
+  }
+
+  .notes__cover {
+    flex: 0 0 7.5rem;
+  }
+
+  .notes__meta {
+    min-width: 0;
+  }
+
+  .notes__meta h1 {
+    margin-bottom: 0.5rem;
+    font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem);
+    line-height: 1.1;
+  }
+
+  .notes__author {
+    margin-bottom: 0.5rem;
+    opacity: 0.75;
+  }
+
+  /* Notes prose: headings scale with the body text, chapters get a rule */
+  .notes__body :global(:is(p, li, blockquote)) {
+    font-size: 1em;
+    line-height: inherit;
+  }
+
+  .notes__body :global(:is(h2, h3, h4, h5, h6)) {
+    margin-bottom: 0.5em;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .notes__body :global(h2) {
+    margin-top: 2.5em;
+    padding-top: 1.25em;
+    border-top: var(--app-rule-width) solid var(--app-rule-color);
+    font-size: 1.75em;
+    font-weight: 700;
+  }
+
+  .notes__body :global(h2:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .notes__body :global(h3) {
+    margin-top: 2em;
+    font-size: 1.375em;
+    font-weight: 650;
+  }
+
+  .notes__body :global(h4) {
+    margin-top: 1.75em;
+    font-size: 1.15em;
+    font-weight: 600;
+  }
+
+  .notes__body :global(:is(h5, h6)) {
+    margin-top: 1.5em;
+    font-size: 1em;
+    font-weight: 600;
+  }
+
+  .notes__body :global(:is(ul, ol)) {
+    padding-inline-start: 1.5em;
+  }
+
+  .notes__body :global(li + li),
+  .notes__body :global(li > :is(ul, ol)) {
+    margin-top: 0.375em;
+  }
+
+  .notes__body :global(li > :is(ul, ol)) {
+    margin-bottom: 0;
+  }
+
+  .notes__body :global(blockquote) {
+    margin-block: 1.5em;
+    padding: 0.25em 0 0.25em 1.25em;
+    border-inline-start-color: var(--app-accent-color);
+  }
+
+  .notes__body :global(blockquote > :last-child) {
+    margin-bottom: 0;
+  }
+
+  .notes__body :global(hr) {
+    margin-block: 2em;
+    border: none;
+    border-top: var(--app-rule-width) solid var(--app-rule-color);
+  }
+
+  /* Tables scroll inside themselves on narrow screens, not the page */
+  .notes__body :global(table) {
+    display: block;
+    max-width: 100%;
+    margin-block: 1.5em;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.875em;
+    line-height: 1.5;
+  }
+
+  .notes__body :global(:is(th, td)) {
+    padding: 0.5em 0.75em;
+    border: var(--app-rule-width) solid var(--app-rule-color);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .notes__body :global(th) {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Diagrams fit the column on a white card, so transparent ones (black
+     lines on nothing) stay legible on the dark theme. Tall ones are capped
+     so a single figure doesn't fill the screen. */
+  .notes__body :global(img) {
+    display: block;
+    box-sizing: border-box;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 32rem;
+    margin: 1.5em auto;
+    padding: 0.75rem;
+    background-color: var(--white);
+    box-shadow: var(--app-box-shadow);
+  }
+
+  @media (max-width: 749px) {
+    .notes__header {
+      gap: var(--app-spacing);
+    }
+
+    .notes__cover {
+      flex-basis: 5rem;
+    }
+  }
+</style>
