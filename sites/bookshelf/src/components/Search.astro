@@ -2,7 +2,7 @@
 /**
  * Search box for the shelves. Expects the page to render an "All Books"
  * shelf marked [data-all-books] holding every <Book>, kept hidden until a
- * search runs.
+ * search or the notes filter runs.
  */
 ---
 
@@ -38,22 +38,51 @@
       Type <kbd>/</kbd> to search
     </span>
   </span>
+  <label class="search__filter">
+    <input
+      class="search__filter-input"
+      type="checkbox"
+      data-book-notes-filter
+    />
+    <span class="search__filter-box" aria-hidden="true">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 12 12"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="square"
+        focusable="false"
+      >
+        <path d="m2.5 6.25 2.5 2.5 4.5-5"></path>
+      </svg>
+    </span>
+    With notes
+  </label>
   <p class="search__status" role="status" data-book-search-status></p>
 </div>
 
 <script>
   /**
-   * Filters books by title or author as you type. While searching, the
-   * genre shelves and nav give way to a single "All Books" shelf.
+   * Filters books by title or author as you type, and optionally to those
+   * with notes. While filtering, the genre shelves and nav give way to a
+   * single "All Books" shelf.
    */
+  // Filters survive a trip to a notes page and back for the session. The
+  // client-side router re-renders the shelf, so the fields start empty.
+  const STORAGE_KEY = "bookshelf:filters";
+
   function initSearch() {
     const input =
       document.querySelector<HTMLInputElement>("[data-book-search]");
     const status = document.querySelector<HTMLElement>(
       "[data-book-search-status]",
     );
+    const notesOnly = document.querySelector<HTMLInputElement>(
+      "[data-book-notes-filter]",
+    );
     const all = document.querySelector<HTMLElement>("[data-all-books]");
-    if (!input || !status || !all) return;
+    if (!input || !notesOnly || !status || !all) return;
 
     const shelves = document.querySelectorAll<HTMLElement>(
       ".genre:not([data-all-books]), [data-genre-nav]",
@@ -67,25 +96,38 @@
         .replace(/\p{Diacritic}/gu, "")
         .toLowerCase()
         .trim();
+      const filtering = Boolean(query) || notesOnly.checked;
       let matches = 0;
 
       for (const book of books) {
-        const match = book.dataset.search!.includes(query);
+        const match =
+          book.dataset.search!.includes(query) &&
+          (!notesOnly.checked || book.dataset.notes !== undefined);
         book.hidden = !match;
         if (match) matches++;
       }
 
-      for (const shelf of shelves) shelf.hidden = Boolean(query);
-      all.hidden = !query || matches === 0;
+      for (const shelf of shelves) shelf.hidden = filtering;
+      all.hidden = !filtering || matches === 0;
 
-      status.textContent = !query
+      status.textContent = !filtering
         ? ""
         : matches === 0
           ? "No books match."
           : `${matches} of ${books.length} books`;
+
+      try {
+        sessionStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ query: input.value, notes: notesOnly.checked }),
+        );
+      } catch {
+        // Storage blocked: filters just won't be remembered
+      }
     };
 
     input.addEventListener("input", filter);
+    notesOnly.addEventListener("change", filter);
     // Escape leaves the field; the query and results stay put
     input.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
@@ -93,8 +135,18 @@
       event.preventDefault();
       input.blur();
     });
-    // Browsers may restore the field's value on back/forward navigation
-    if (input.value) filter();
+    // Browsers may restore the fields' values on back/forward navigation;
+    // otherwise fall back to what this session last used
+    if (!input.value && !notesOnly.checked) {
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? "{}");
+        input.value = typeof saved.query === "string" ? saved.query : "";
+        notesOnly.checked = saved.notes === true;
+      } catch {
+        // Nothing usable stored
+      }
+    }
+    if (input.value || notesOnly.checked) filter();
   }
 
   document.addEventListener("astro:page-load", initSearch);
@@ -120,7 +172,7 @@
   .search {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: stretch;
     gap: 0.5rem var(--app-spacing);
   }
 
@@ -193,7 +245,83 @@
     }
   }
 
+  /* Toggle chip: matches the search field's height and border, fills with
+     the accent colour when on. The checkbox stays real but invisible. */
+  .search__filter {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem 0.5rem 0.75rem;
+    font-family: var(--app-font-family-monospace);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    border: var(--app-border-width) solid var(--app-border-color);
+    border-radius: var(--app-border-radius);
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--app-transition),
+      border-color var(--app-transition),
+      color var(--app-transition);
+  }
+
+  .search__filter:hover {
+    border-color: var(--app-color);
+  }
+
+  .search__filter-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .search__filter-box {
+    display: grid;
+    place-items: center;
+    width: 1rem;
+    height: 1rem;
+    border: var(--app-border-width) solid currentColor;
+  }
+
+  .search__filter-box svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    visibility: hidden;
+  }
+
+  .search__filter:has(:checked) {
+    background-color: var(--app-accent-background);
+    border-color: var(--app-accent-background);
+    color: var(--white);
+  }
+
+  .search__filter:has(:checked):hover {
+    background-color: var(--app-accent-background--hover);
+    border-color: var(--app-accent-background--hover);
+  }
+
+  .search__filter:has(:checked) .search__filter-box svg {
+    visibility: visible;
+  }
+
+  .search__filter:has(:focus-visible) {
+    outline: 2px solid var(--app-accent-color);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .search__filter {
+      transition: none;
+    }
+  }
+
   .search__status {
+    align-self: center;
     margin: 0;
     font-family: var(--app-font-family-monospace);
     font-size: 0.875rem;

@@ -7,7 +7,7 @@ import Book from "../components/Book.astro";
 import GenreNav from "../components/GenreNav.astro";
 import Search from "../components/Search.astro";
 
-type BookData = CollectionEntry<"books">["data"];
+type BookData = CollectionEntry<"books">["data"] & { notes?: string };
 
 /**
  * Catalogue heading for the first-listed author, inverted library-style:
@@ -37,7 +37,11 @@ const { compare } = new Intl.Collator("en", {
 const byAuthor = (a: BookData, b: BookData) =>
   compare(heading(a), heading(b)) || compare(filingTitle(a), filingTitle(b));
 
-const books = (await getCollection("books")).map(({ data }) => data);
+// Books with a Markdown body link to their notes page
+const books = (await getCollection("books")).map(({ id, data, body }) => ({
+  ...data,
+  notes: body?.trim() ? `/books/${id}/` : undefined,
+}));
 const allBooks = [...books].sort(byAuthor);
 const shelves = [...genres]
   .sort(compare)
