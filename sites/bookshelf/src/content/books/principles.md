@@ -107,7 +107,7 @@ Understanding how nature and evolution work can be helpful in many ways. It help
 
 **Remember _"No pain, no gain"_**
 
-- Everything nature has made has a purpose, so nature gave us pain for a purpose. \*\*\*\*
+- Everything nature has made has a purpose, so nature gave us pain for a purpose.
 
 **It is a fundamental law of nature that in order to gain strength one has to push one's limits, which is painful.**
 
@@ -153,7 +153,7 @@ Life gives your so many decisions to make and so many opportunities to recover f
 
 Whatever circumstances life brings you, you will be more likely to succeed and find happiness if you take responsibility for making your decisions well instead of complaining about things being beyond your control.
 
-**It's up to you to connect what you want with what you need to do to get it and then find the courage **to carry it through.\*\*
+**It's up to you to connect what you want with what you need to do to get it and then find the courage to carry it through.**
 
 ### Look at the machine from the higher level
 

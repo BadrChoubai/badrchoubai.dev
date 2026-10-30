@@ -21,7 +21,7 @@ color: "#d96c4d"
   - Many of the interconnections in systems operate through the flow of information.
   - Information holds systems together and plays a great role in determining how they operate.
 - **Purpose:**
-  - The least obvious part of a system, it's function \*_or purpose_,\* is often the most crucial determinant of a system's behavior.
+  - The least obvious part of a system, it's function _or purpose_, is often the most crucial determinant of a system's behavior.
 
 > Systems thinkers use graphs of behavior over time to understand trends over time rather than focusing on individual events
 
@@ -33,7 +33,7 @@ Their employees, customers, and products.
 
 **Interconnections →**
 
-**\*(** The relations that hold elements together )\*
+_(The relations that hold elements together)_
 
 The local community / other cafés. it's revenue streams, technology, marketing and the ecosystem
 
@@ -43,13 +43,13 @@ Support the local economy, provide a place where members of the community can ga
 
 > A system is more than the sum of its parts. It may exhibit adaptive, dynamic, self-preserving, and sometimes evolutionary behavior.
 
-### How the System Runs Itself - _Feedback_
+### How the System Runs Itself - Feedback
 
-If you see a behavior that persists over time, there is likely a mechanism creating that consistent behavior; That mechanism operates through a **Feedback Loop*.***
+If you see a behavior that persists over time, there is likely a mechanism creating that consistent behavior; That mechanism operates through a **_Feedback Loop_**.
 
 #### Stabilizing Loops - Balancing Feedback
 
-Balancing feedback loops are "_Goal-Seeking_" or "_Stability Seeking_". \*\*Each tries to keep a stock at a given value or within a range of values.
+Balancing feedback loops are "_Goal-Seeking_" or "_Stability Seeking_". Each tries to keep a stock at a given value or within a range of values.
 
 #### Runaway Loops - Reinforcing Feedback
 
@@ -87,7 +87,7 @@ A **_Feedback Loop_** is a closed chain of causal connections from a stock, thro
 
 > A delay in a balancing feedback loop makes a system likely to oscilate.
 
-\*\* Changing the length of a delay may or may not make a large change in the behavior of a system
+Changing the length of a delay may or may not make a large change in the behavior of a system
 
 ### Two Stock Systems
 
@@ -104,7 +104,7 @@ A **_Feedback Loop_** is a closed chain of causal connections from a stock, thro
 - **Nonrenewable resources are stock limited**
 - **Renewable resources are flow limited**
 
-\*\* Depending on the type of the delay and the relative lengths of other delays
+Depending on the type of the delay and the relative lengths of other delays
 
 ## Chapter Three: Why Systems Work So Well
 
@@ -169,7 +169,7 @@ You can navigate well in an interconnected, feedback dominated world unless you 
 
 Systems thinking goes back and forth constantly between structure and behavior.
 
-**Structure →** Diagrams of stocks, flows and behavior. \*\*\*\*
+**Structure →** Diagrams of stocks, flows and behavior.
 
 **Behavior →** Time graphs
 
@@ -372,7 +372,7 @@ It is in this space of mastery over paradigms that people overcome addictions, l
 
 **Linear Relationship →** A relationship between two elements in a system that has constant proportion between cause and effect and so can be drawn in a straight line on a graph
 
-**Nonlinear Relationship →** A relationship between two elements in a systems where the cause does not produce a proportional effect. \*\*\*\*
+**Nonlinear Relationship →** A relationship between two elements in a systems where the cause does not produce a proportional effect.
 
 **Principle-Agent Problem →** A conflict in priorities between a person or group and the representative authorized to act on their behalf.
 
