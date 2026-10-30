@@ -94,6 +94,6 @@ Our intuition is shaped by preconceived notions ("biases") that shape how we thi
 2. **Exposure Effect →** we tend to prefer things that are familiar.
 3. **Hawthorne Effect →** People have a tendency to revert back to old habits/behaviors once the novelty of new ones wear off.
 
-### We Just Can't Predict...
+### We Just Can't Predict
 
 Humans like to try to predict the future by extrapolating it from past events. We assume that events form a more or less stable, linear progression, with easily defined cause and effect. They don't.

@@ -65,7 +65,7 @@ Customer Creation and Company Building, part of the Execution process is focused
 
 **To do this:** leave guesswork behind and get "outside the building" in order to learn what the high-value customer problems are, what about your product solves those problems, and who specifically are your customer and user.
 
-**The Customer Development Team:** The job of this team is to see whether there are customers and a market for your founding vision. The initial product specification comes from the founder's vision, not the sum of a set of focus groups. \*\*\*\*
+**The Customer Development Team:** The job of this team is to see whether there are customers and a market for your founding vision. The initial product specification comes from the founder's vision, not the sum of a set of focus groups.
 
 #### Step Two: Customer Validation
 
@@ -79,7 +79,7 @@ Customer Creation and Company Building, part of the Execution process is focused
 
 #### Step Three: Customer Creation
 
-**The Goal:** Create end-user demand and drive that demand into the company's sales channel**.** Note that this process varies with the type of startup.
+**The Goal:** Create end-user demand and drive that demand into the company's sales channel. Note that this process varies with the type of startup.
 
 This step is placed after Customer Validation to move heavy marketing spending after the point where a startup acquires it first customers, thus allowing the company to control its cash-burn rate.
 
@@ -199,15 +199,15 @@ A startup builds its product for a small group of initial customers, and builds 
 
 Have productive Customer Development/Product Development team synchronization meetings will ensure that once key customer information becomes available, it is integrated into the product's future development.
 
-#### Overview of the Customer Discovery Process
+### Overview of the Customer Discovery Process
 
-##### Phase One
+#### Phase One
 
 Phase 1 is a rigorous process of writing a series of briefs that capture the hypotheses embodied in your company's vision and business model.
 
 These are the assumptions about your product, customers, pricing, demand, market, and competition.
 
-##### Phase Two
+#### Phase Two
 
 In phase 2, you qualify those assumptions by testing them in front of potential customers.
 
@@ -215,7 +215,7 @@ In phase 2, you qualify those assumptions by testing them in front of potential 
 
 **Before the next step:** Take all that you've learned, integrate it, update Engineering with customer feedback, and jointly revise your product and customer briefs.
 
-##### Phase Three
+#### Phase Three
 
 In phase 3, take your revised product concept and test its features in front of customers.
 
@@ -223,7 +223,7 @@ In phase 3, take your revised product concept and test its features in front of 
 
 **At the same time** you've been testing the product features you've also been testing the validity of your entire business model. A valid business model consists of customers who place a high value on your solution, and find the solution you offer is: (for a company): Mission Critical, (for a consumer): "Have-to-have".
 
-##### Phase Four
+#### Phase Four
 
 In phase 4, **stop** and verify:
 
@@ -241,7 +241,7 @@ This phase culminates in the **deliverables** for the **Customer Discovery** ste
 
 **If and only if,** you are successful in this step do you proceed to **Customer Validation.**
 
-## The Customer Development Team
+### The Customer Development Team
 
 At first this team may consist of the company's technical founder who moves out to talk with customers while the other engineers build the product. But whether a single individual or a team, CD must have the authority to radically change the company's direction [know when to pivot]. To succeed in this process the team members must possess:
 
