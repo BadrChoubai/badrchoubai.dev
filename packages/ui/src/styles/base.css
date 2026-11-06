@@ -28,7 +28,7 @@
   --app-box-shadow: 0 0.3rem 0.8rem rgba(0, 0, 0, 0.12);
 
   /* Container */
-  --app-container-max: 1400px;
+  --app-container-max: 1200px;
   --app-container-width: 100%;
 
   color-scheme: dark;
