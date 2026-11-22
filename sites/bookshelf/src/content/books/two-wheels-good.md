@@ -2,5 +2,5 @@
 title: "Two Wheels Good"
 author: "Jody Rosen"
 genre: "World History"
-color: "#f83048"
+color: "#5aa0d8"
 ---
