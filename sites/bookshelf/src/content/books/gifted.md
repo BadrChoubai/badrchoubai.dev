@@ -2,5 +2,5 @@
 title: "Gifted"
 author: "Suzumi Suzuki"
 genre: "Fiction"
-color: "#ff3500"
+color: "#e85d55"
 ---
