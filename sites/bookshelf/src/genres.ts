@@ -8,4 +8,5 @@ export const genres = [
   "Science & Technology",
   "Business & Finance",
   "Self-Improvement",
+  "History",
 ] as const;
