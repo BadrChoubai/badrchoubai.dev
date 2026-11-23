@@ -26,8 +26,6 @@ The enclosure is the
 which I bought from Framework's website. Everything else came over from the
 laptop: 32GB of RAM, the 512GB SSD, and the original Wi-Fi card and antennas.
 
-<!-- TODO: a photo of the board in the case would fit here. -->
-
 ## Setup
 
 I didn't install a new distro. The board already ran Fedora from when it was my
@@ -41,8 +39,6 @@ the same way my laptops do.
 
 A few small issues came up along the way, but once I'd fixed them the rest went
 smoothly.
-
-<!-- TODO: name the issues; they're the most useful part for anyone doing the same. -->
 
 ## Why Tailscale?
 
