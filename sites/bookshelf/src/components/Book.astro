@@ -48,6 +48,8 @@ const Tag = href ? "a" : "div";
   >
     <BookCover {book} />
     <span class="book__title">{book.title}</span>
+    <!-- Read as "Title, by Author" rather than running the two together -->
+    <span class="sr-only">, by</span>
     <span class="book__author">{book.author}</span>
     {book.notes && <span class="book__notes">Notes</span>}
   </Tag>

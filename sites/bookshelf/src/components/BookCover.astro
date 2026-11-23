@@ -13,7 +13,8 @@ const { book, width = 320 } = Astro.props;
 <div class="cover" style={`--cover-color: ${book.color};`}>
   {
     book.cover ? (
-      <Image src={book.cover} alt={`Cover of ${book.title}`} width={width} />
+      // Decorative: the title is always printed beside the cover
+      <Image src={book.cover} alt="" width={width} />
     ) : (
       <div class="cover__plain" aria-hidden="true">
         <span class="cover__title">{book.title}</span>
