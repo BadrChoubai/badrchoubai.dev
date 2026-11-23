@@ -16,45 +16,45 @@ const projects = (await getCollection("projects", isPublished)).sort(
       projects.map((project) => {
         const { data } = project;
         return (
-        <li class="project">
-          <h3 class="project__title">{data.title}</h3>
-          <p class="project__desc">{data.description}</p>
-          <ul class="project__stack" aria-label="Built with">
-            {data.stack.map((tech) => (
-              <li>{tech}</li>
-            ))}
-          </ul>
-          <div class="project__links">
-            {hasWriteup(project) && (
-              <a
-                href={`/projects/${project.id}/`}
-                aria-label={`${data.title} write-up`}
-              >
-                write-up
-              </a>
-            )}
-            {data.repo && (
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={data.repo}
-                aria-label={`${data.title} source code on GitHub`}
-              >
-                source
-              </a>
-            )}
-            {data.live && (
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={data.live}
-                aria-label={`${data.title} live site`}
-              >
-                live
-              </a>
-            )}
-          </div>
-        </li>
+          <li class="project">
+            <h3 class="project__title">{data.title}</h3>
+            <p class="project__desc">{data.description}</p>
+            <ul class="project__stack" aria-label="Built with">
+              {data.stack.map((tech) => (
+                <li>{tech}</li>
+              ))}
+            </ul>
+            <div class="project__links">
+              {hasWriteup(project) && (
+                <a
+                  href={`/projects/${project.id}/`}
+                  aria-label={`${data.title} write-up`}
+                >
+                  write-up
+                </a>
+              )}
+              {data.repo && (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={data.repo}
+                  aria-label={`${data.title} source code on GitHub`}
+                >
+                  source
+                </a>
+              )}
+              {data.live && (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={data.live}
+                  aria-label={`${data.title} live site`}
+                >
+                  live
+                </a>
+              )}
+            </div>
+          </li>
         );
       })
     }

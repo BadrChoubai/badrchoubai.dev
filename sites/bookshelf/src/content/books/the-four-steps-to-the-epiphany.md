@@ -126,13 +126,13 @@ One of the most important considerations to make as a startup is where you're tr
 - A startup that wants to bring a new product into an existing market, or a new product to a new market. Apple and Facebook are examples of two companies that have done this very successfully.
 - A startup that wants to re-segment a market, either as a low-cost entrant or as a niche player. Disney+ is an example of the latter, coming into streaming media with a price of $6.99/month.
 
-|             | Existing Market     | Resegmented Market                                                 | New Market                                                   |
-| ----------- | ------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Customers   | Existing            | Existing                                                           | New/New usage                                                |
-| Customer Needs | Performance      | 1. Cost<br>2. Perceived need                                       | Simplicity & convenience                                     |
-| Performance | Better/faster       | 1. Good enough at the low end<br>2. Good enough for new niche      | Low in "traditional attributes", improved by new customer metrics |
-| Competition | Existing incumbents | Existing incumbents                                                | Non-consumption / other startups                             |
-| Risks       | Existing incumbents | 1. Existing incumbents<br>2. Niche strategy fails                  | Market adoption                                              |
+|                | Existing Market     | Resegmented Market                                            | New Market                                                        |
+| -------------- | ------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Customers      | Existing            | Existing                                                      | New/New usage                                                     |
+| Customer Needs | Performance         | 1. Cost<br>2. Perceived need                                  | Simplicity & convenience                                          |
+| Performance    | Better/faster       | 1. Good enough at the low end<br>2. Good enough for new niche | Low in "traditional attributes", improved by new customer metrics |
+| Competition    | Existing incumbents | Existing incumbents                                           | Non-consumption / other startups                                  |
+| Risks          | Existing incumbents | 1. Existing incumbents<br>2. Niche strategy fails             | Market adoption                                                   |
 
 > 💡 As a company follows the Customer Development process the importance of Market Type grows in each step.
 
