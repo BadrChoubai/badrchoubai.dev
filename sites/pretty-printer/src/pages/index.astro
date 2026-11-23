@@ -56,6 +56,13 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
               <option value="host_grotesk">Host Grotesk</option>
               <option value="jetbrains_mono">JetBrains Mono</option>
             </select>
+            <button
+              class="style-btn"
+              id="settingsOpen"
+              title="Settings"
+              aria-label="Settings"
+              aria-haspopup="dialog">⚙</button
+            >
           </div>
           <div class="toolbar-sep"></div>
           <!-- Markdown shortcut buttons -->
@@ -92,19 +99,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
         </div>
         <div class="panes">
           <div class="pane visible" id="paneEdit">
-            <textarea
-              id="editor"
-              placeholder={`---
-title: Title
-author: Author (optional)
----
-
-Write Markdown here…
-
-# Heading
-**bold**, *italic*, [link](https://example.com)
-> blockquote
-- bullet list`}></textarea>
+            <div id="editor"></div>
           </div>
           <div class="pane" id="panePreview">
             <div id="preview"></div>
@@ -119,6 +114,18 @@ Write Markdown here…
       </div>
     </div>
 
+    <!-- Settings -->
+    <dialog id="settings" aria-labelledby="settingsTitle">
+      <form method="dialog">
+        <h2 id="settingsTitle">Settings</h2>
+        <label class="setting">
+          <input type="checkbox" id="vimToggle" />
+          Vim keybindings
+        </label>
+        <button class="settings-done">Done</button>
+      </form>
+    </dialog>
+
     <!-- Print-only output -->
     <div class="print-content" id="printContent">
       <h1 id="contentTitle"></h1>
@@ -128,6 +135,22 @@ Write Markdown here…
 
     <script>
       import { marked } from "marked";
+      import {
+        Compartment,
+        EditorState,
+        type Extension,
+      } from "@codemirror/state";
+      import {
+        EditorView,
+        drawSelection,
+        keymap,
+        placeholder as editorPlaceholder,
+      } from "@codemirror/view";
+      import {
+        defaultKeymap,
+        history,
+        historyKeymap,
+      } from "@codemirror/commands";
 
       // ── Markdown renderer setup ──
       marked.setOptions({
@@ -183,7 +206,10 @@ Write Markdown here…
         document.getElementById(id) as T;
 
       const el = {
-        editor: byId<HTMLTextAreaElement>("editor"),
+        editor: byId("editor"),
+        settings: byId<HTMLDialogElement>("settings"),
+        settingsOpen: byId("settingsOpen"),
+        vimToggle: byId<HTMLInputElement>("vimToggle"),
         copy: byId("copy"),
         print: byId("print"),
         clear: byId("clear"),
@@ -264,7 +290,7 @@ Write Markdown here…
 
       // ── Update functions ──
       function updateState() {
-        state.text = el.editor.value;
+        state.text = view.state.doc.toString();
         const { data, body } = parseFrontmatter(state.text);
         state.title = data.title ?? "";
         state.author = data.author ?? "";
@@ -339,61 +365,148 @@ Write Markdown here…
         queryParams.updateURL(state.text);
       }
 
+      // ── Editor ──
+      // Vim mode sits in its own compartment so it can be switched on and
+      // off; the extension is only downloaded the first time it's enabled
+      const vimMode = new Compartment();
+      let vimExtension: Extension | null = null;
+
+      const editorTheme = EditorView.theme({
+        "&": {
+          flex: "1",
+          minHeight: "0",
+          color: "var(--app-color)",
+          backgroundColor: "transparent",
+          // At least 16px, or iOS Safari zooms in when the editor is focused
+          fontSize: "1rem",
+        },
+        "&.cm-focused": { outline: "none" },
+        ".cm-scroller": {
+          fontFamily: '"JetBrains Mono Variable", monospace',
+          lineHeight: "1.7",
+        },
+        ".cm-content": {
+          padding: "var(--editor-pad-y) 0",
+          caretColor: "var(--app-color)",
+        },
+        ".cm-line": { padding: "0 var(--editor-pad-x)" },
+        ".cm-placeholder": { color: "var(--app-color)", opacity: "0.4" },
+        ".cm-cursor, .cm-dropCursor": {
+          borderLeftColor: "var(--app-color)",
+        },
+        "& .cm-selectionLayer .cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground":
+          {
+            backgroundColor:
+              "color-mix(in srgb, var(--app-accent) 25%, transparent)",
+          },
+        ".cm-fat-cursor": {
+          background:
+            "color-mix(in srgb, var(--app-accent) 60%, transparent) !important",
+        },
+        "&:not(.cm-focused) .cm-fat-cursor": {
+          background: "none !important",
+          outline: "solid 1px var(--app-accent) !important",
+        },
+        // Vim's mode line and `:` command prompt
+        ".cm-panels": {
+          backgroundColor: "var(--app-surface)",
+          color: "var(--app-color)",
+          fontFamily: '"JetBrains Mono Variable", monospace',
+        },
+        ".cm-panels-bottom": { borderTop: "1px solid var(--app-border)" },
+        ".cm-vim-panel": { padding: "0.25rem var(--editor-pad-x)" },
+        ".cm-vim-panel input": { color: "inherit", fontSize: "1rem" },
+      });
+
+      const view = new EditorView({
+        parent: el.editor,
+        state: EditorState.create({
+          doc: queryParams.parse(),
+          extensions: [
+            vimMode.of([]), // before the other keymaps, so Vim sees keys first
+            history(),
+            drawSelection(),
+            keymap.of([
+              {
+                key: "Tab",
+                run: (v) => {
+                  v.dispatch(v.state.replaceSelection("  "));
+                  return true;
+                },
+              },
+              ...defaultKeymap,
+              ...historyKeymap,
+            ]),
+            EditorView.lineWrapping,
+            EditorView.contentAttributes.of({ "aria-label": "Markdown" }),
+            editorPlaceholder(`---
+title: Title
+author: Author (optional)
+---
+
+Write Markdown here…
+
+# Heading
+**bold**, *italic*, [link](https://example.com)
+> blockquote
+- bullet list`),
+            editorTheme,
+            EditorView.updateListener.of((update) => {
+              if (update.docChanged) updateAll();
+            }),
+          ],
+        }),
+      });
+
+      async function setVim(on: boolean) {
+        if (on && !vimExtension) {
+          const { vim } = await import("@replit/codemirror-vim");
+          vimExtension = vim({ status: true });
+        }
+        view.dispatch({
+          effects: vimMode.reconfigure(on ? vimExtension! : []),
+        });
+      }
+
       // ── Markdown insertion helpers ──
       // On touch screens, focusing the editor pops open the keyboard, so leave
       // that to the user tapping into it
       const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
       function focusEditor() {
-        if (!isTouch) el.editor.focus();
+        if (!isTouch) view.focus();
       }
 
+      // Wrap the selection (or a placeholder) and select what's inside
       function wrapSelection(
         before: string,
         after: string,
         placeholder: string,
       ) {
-        const ta = el.editor;
-        const start = ta.selectionStart;
-        const end = ta.selectionEnd;
-        const selected = ta.value.slice(start, end) || placeholder;
-        ta.setRangeText(before + selected + after, start, end, "select");
-        // Move cursor to just inside the wrapper if no selection
-        if (start === end) {
-          ta.selectionStart = start + before.length;
-          ta.selectionEnd = start + before.length + placeholder.length;
-        }
+        const { from, to } = view.state.selection.main;
+        const inner = view.state.sliceDoc(from, to) || placeholder;
+        const anchor = from + before.length;
+        view.dispatch({
+          changes: { from, to, insert: before + inner + after },
+          selection: { anchor, head: anchor + inner.length },
+        });
         focusEditor();
-        updateAll();
       }
 
+      // Toggle a prefix on the current line
       function prefixLine(prefix: string) {
-        const ta = el.editor;
-        const start = ta.selectionStart;
-        const val = ta.value;
-        // Find start of current line
-        const lineStart = val.lastIndexOf("\n", start - 1) + 1;
-        const lineEnd = val.indexOf("\n", start);
-        const line = val.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
-        // Toggle: remove prefix if already present, add if not
-        const newLine = line.startsWith(prefix)
-          ? line.slice(prefix.length)
-          : prefix + line;
-        ta.setRangeText(
-          newLine,
-          lineStart,
-          lineEnd === -1 ? val.length : lineEnd,
-          "end",
-        );
+        const line = view.state.doc.lineAt(view.state.selection.main.head);
+        view.dispatch({
+          changes: line.text.startsWith(prefix)
+            ? { from: line.from, to: line.from + prefix.length }
+            : { from: line.from, insert: prefix },
+        });
         focusEditor();
-        updateAll();
       }
 
       function insertAtCursor(text: string) {
-        const ta = el.editor;
-        ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, "end");
+        view.dispatch(view.state.replaceSelection(text));
         focusEditor();
-        updateAll();
       }
 
       // ── Toolbar button handlers ──
@@ -413,10 +526,8 @@ Write Markdown here…
       el.mdOl.addEventListener("click", () => prefixLine("1. "));
       el.mdHr.addEventListener("click", () => insertAtCursor("\n\n---\n\n"));
       el.mdLink.addEventListener("click", () => {
-        const ta = el.editor;
-        const selected = ta.value.slice(ta.selectionStart, ta.selectionEnd);
-        if (selected) {
-          wrapSelection("[", "](https://)", selected);
+        if (!view.state.selection.main.empty) {
+          wrapSelection("[", "](https://)", "");
         } else {
           wrapSelection("[link text](", ")", "https://");
         }
@@ -444,8 +555,25 @@ Write Markdown here…
         updateFontStyles();
       });
 
-      // ── Main inputs ──
-      el.editor.addEventListener("input", updateAll);
+      // ── Settings ──
+      const VIM_KEY = "pretty-printer:vim";
+
+      el.settingsOpen.addEventListener("click", () => el.settings.showModal());
+      // Clicking the backdrop closes the dialog
+      el.settings.addEventListener("click", (e) => {
+        if (e.target === el.settings) el.settings.close();
+      });
+      el.settings.addEventListener("close", focusEditor);
+
+      el.vimToggle.addEventListener("change", () => {
+        const on = el.vimToggle.checked;
+        try {
+          localStorage.setItem(VIM_KEY, on ? "1" : "0");
+        } catch {
+          // Storage unavailable (private mode): the setting lasts this visit
+        }
+        setVim(on);
+      });
 
       // ── Actions ──
       function requireTitle() {
@@ -453,18 +581,19 @@ Write Markdown here…
         // No title yet: add a frontmatter block (or a title line to the
         // existing one) and select the placeholder so it can be typed over
         const placeholder = "Title";
-        const ta = el.editor;
-        const hasFrontmatter = FRONTMATTER.test(ta.value);
+        const text = view.state.doc.toString();
+        const hasFrontmatter = FRONTMATTER.test(text);
         const insert = hasFrontmatter
           ? `title: ${placeholder}\n`
           : `---\ntitle: ${placeholder}\n---\n\n`;
-        const at = hasFrontmatter ? ta.value.indexOf("\n") + 1 : 0;
-        ta.setRangeText(insert, at, at);
-        ta.selectionStart = at + insert.indexOf(placeholder);
-        ta.selectionEnd = ta.selectionStart + placeholder.length;
+        const at = hasFrontmatter ? text.indexOf("\n") + 1 : 0;
+        const anchor = at + insert.indexOf(placeholder);
+        view.dispatch({
+          changes: { from: at, insert },
+          selection: { anchor, head: anchor + placeholder.length },
+        });
         el.tabEdit.click();
-        ta.focus();
-        updateAll();
+        view.focus();
         alert("Add a title to the frontmatter to share or print.");
         return false;
       }
@@ -480,8 +609,9 @@ Write Markdown here…
       });
 
       el.clear.addEventListener("click", () => {
-        el.editor.value = "";
-        updateAll();
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: "" },
+        });
       });
 
       el.print.addEventListener("click", () => {
@@ -489,22 +619,13 @@ Write Markdown here…
         window.print();
       });
 
-      // ── Tab key in textarea → insert spaces ──
-      el.editor.addEventListener("keydown", (e) => {
-        if (e.key === "Tab") {
-          e.preventDefault();
-          el.editor.setRangeText(
-            "  ",
-            el.editor.selectionStart,
-            el.editor.selectionEnd,
-            "end",
-          );
-          updateAll();
-        }
-      });
-
       // ── Init ──
-      el.editor.value = queryParams.parse();
+      try {
+        el.vimToggle.checked = localStorage.getItem(VIM_KEY) === "1";
+      } catch {
+        // Storage unavailable: Vim mode starts off
+      }
+      if (el.vimToggle.checked) setVim(true);
       updateAll();
     </script>
   </body>
@@ -660,6 +781,52 @@ Write Markdown here…
     border-color: var(--app-accent);
   }
 
+  #settingsOpen {
+    flex: 0 0 auto;
+    width: auto;
+    font-size: 1.1rem;
+  }
+
+  /* ── Settings dialog ── */
+  #settings {
+    width: min(22rem, calc(100% - 2rem));
+    padding: 1.25rem;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: var(--app-bg);
+    color: var(--app-color);
+    font-family: "Inter Variable", system-ui, sans-serif;
+  }
+
+  #settings::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
+
+  #settings h2 {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+  }
+
+  .setting {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .setting input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    accent-color: var(--app-accent);
+  }
+
+  .settings-done {
+    margin-top: 1.25rem;
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+  }
+
   /* ── Editor / Preview split ── */
   #editor-container {
     flex: 1;
@@ -719,27 +886,16 @@ Write Markdown here…
     flex-direction: column;
   }
 
-  textarea {
+  /* CodeMirror mounts in here and is styled by its theme in the script;
+     these set its padding */
+  #editor {
+    --editor-pad-y: 1.5rem;
+    --editor-pad-x: 1.5rem;
     flex: 1;
     width: 100%;
-    padding: 1.5rem;
-    border: none;
-    outline: none;
-    background: transparent;
-    color: var(--app-color);
-    font: inherit;
-    font-family: "JetBrains Mono Variable", monospace;
-    /* At least 16px, or iOS Safari zooms in when the editor is focused */
-    font-size: 1rem;
-    line-height: 1.7;
-    resize: none;
-    white-space: pre;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-  }
-
-  textarea::placeholder {
-    opacity: 0.4;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Preview pane */
@@ -1107,6 +1263,7 @@ Write Markdown here…
     .pane {
       display: flex !important;
       flex: 1;
+      min-width: 0;
       border-right: 1px solid var(--app-border);
     }
 
@@ -1114,8 +1271,9 @@ Write Markdown here…
       border-right: none;
     }
 
-    textarea {
-      padding: 2.5rem 3rem;
+    #editor {
+      --editor-pad-y: 2.5rem;
+      --editor-pad-x: 3rem;
     }
 
     #preview {
