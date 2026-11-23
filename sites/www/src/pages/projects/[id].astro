@@ -123,6 +123,34 @@ const { Content } = await render(project);
     line-height: inherit;
   }
 
+  /* Links in copy: the base style drops the underline, so bring one back
+     in the accent color so they stand out from the text around them */
+  .writeup__body :global(a) {
+    text-decoration-line: underline;
+    text-decoration-color: var(--app-accent-color);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.2em;
+    transition:
+      color var(--app-transition),
+      text-decoration-thickness var(--app-transition);
+  }
+
+  .writeup__body :global(a:hover) {
+    color: var(--app-accent-color--hover);
+    text-decoration-thickness: 0.15em;
+  }
+
+  .writeup__body :global(a:focus-visible) {
+    outline: 2px solid var(--app-accent-color);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .writeup__body :global(a) {
+      transition: none;
+    }
+  }
+
   .writeup__body :global(:is(h2, h3, h4)) {
     margin-bottom: 0.5em;
     line-height: 1.25;
@@ -130,7 +158,7 @@ const { Content } = await render(project);
   }
 
   .writeup__body :global(h2) {
-    margin-top: 2.25em;
+    margin-top: calc(var(--app-spacing) * 2);
     font-size: 1.5em;
     font-weight: 700;
   }
@@ -140,7 +168,7 @@ const { Content } = await render(project);
   }
 
   .writeup__body :global(h3) {
-    margin-top: 1.75em;
+    margin-top: calc(var(--app-spacing) * 1.5);
     font-size: 1.25em;
     font-weight: 650;
   }
