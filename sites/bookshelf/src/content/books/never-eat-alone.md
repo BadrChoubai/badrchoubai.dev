@@ -2,6 +2,7 @@
 title: Never Eat Alone
 author: "Keith Ferrazzi & Tahl Raz"
 genre: Self-Improvement
+cover: ../../assets/covers/never-eat-alone.jpg
 color: "#ef7a1e"
 ---
 

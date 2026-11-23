@@ -2,6 +2,7 @@
 title: An Elegant Puzzle
 author: Will Larson
 genre: "Business & Finance"
+cover: ../../assets/covers/an-elegant-puzzle.jpg
 color: "#4fa3a5"
 ---
 

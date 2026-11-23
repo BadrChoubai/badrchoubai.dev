@@ -2,6 +2,7 @@
 title: Infrastructure as Code
 author: Kief Morris
 genre: "Science & Technology"
+cover: ../../assets/covers/infrastructure-as-code.jpg
 color: "#e06a58"
 ---
 

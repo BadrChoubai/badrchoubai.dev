@@ -2,6 +2,7 @@
 title: Principles
 author: Ray Dalio
 genre: "Business & Finance"
+cover: ../../assets/covers/principles.jpg
 color: "#db6868"
 ---
 

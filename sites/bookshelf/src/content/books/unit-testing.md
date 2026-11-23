@@ -2,6 +2,7 @@
 title: "Unit Testing: Principles, Practices, and Patterns"
 author: Vladimir Khorikov
 genre: "Science & Technology"
+cover: ../../assets/covers/unit-testing.jpg
 color: "#c9a07a"
 ---
 

@@ -2,6 +2,7 @@
 title: "Pragmatic Thinking & Learning"
 author: Andy Hunt
 genre: Self-Improvement
+cover: ../../assets/covers/pragmatic-thinking-and-learning.jpg
 color: "#5fa86a"
 ---
 

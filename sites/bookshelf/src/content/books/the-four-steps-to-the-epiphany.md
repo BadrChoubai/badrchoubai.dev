@@ -2,6 +2,7 @@
 title: The Four Steps to the Epiphany
 author: Steve Blank
 genre: "Business & Finance"
+cover: ../../assets/covers/the-four-steps-to-the-epiphany.jpg
 color: "#5b8fd6"
 ---
 
