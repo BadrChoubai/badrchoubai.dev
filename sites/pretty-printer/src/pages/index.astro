@@ -48,8 +48,6 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
     <div id="app">
       <!-- Toolbar -->
       <div class="form-container">
-        <input type="text" id="title" placeholder="Title" />
-        <input type="text" id="author" placeholder="Author (optional)" />
         <div class="toolbar-row">
           <div class="font-controls">
             <select id="fontSelect">
@@ -96,7 +94,12 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
           <div class="pane visible" id="paneEdit">
             <textarea
               id="editor"
-              placeholder={`Write Markdown here…
+              placeholder={`---
+title: Title
+author: Author (optional)
+---
+
+Write Markdown here…
 
 # Heading
 **bold**, *italic*, [link](https://example.com)
@@ -136,13 +139,42 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
         return marked.parse(text || "", { async: false });
       }
 
-      // ── State ──
-      type Content = { title: string; author: string; text: string };
+      // ── Frontmatter: a `---` block at the top of the text holding
+      // `title:` and `author:` lines ──
+      const FRONTMATTER =
+        /^---[ \t]*\r?\n(?:([\s\S]*?)\r?\n)?---[ \t]*(?:\r?\n|$)/;
 
+      function parseFrontmatter(text: string) {
+        const match = text.match(FRONTMATTER);
+        const data: Record<string, string> = {};
+        if (!match) return { data, body: text };
+        for (const line of (match[1] ?? "").split(/\r?\n/)) {
+          const field = line.match(/^\s*([\w-]+)\s*:\s*(.*?)\s*$/);
+          if (!field) continue;
+          // Strip one pair of matching surrounding quotes
+          data[field[1].toLowerCase()] = field[2].replace(
+            /^(["'])(.*)\1$/,
+            "$2",
+          );
+        }
+        return { data, body: text.slice(match[0].length) };
+      }
+
+      function withFrontmatter(title: string, author: string, body: string) {
+        if (!title && !author) return body;
+        const lines = ["---"];
+        if (title) lines.push(`title: ${title}`);
+        if (author) lines.push(`author: ${author}`);
+        lines.push("---", "", body);
+        return lines.join("\n");
+      }
+
+      // ── State ──
       const state = {
         title: "",
         author: "",
-        text: "",
+        text: "", // full editor contents, frontmatter included
+        body: "", // the Markdown after the frontmatter
         font: "playfair",
       };
 
@@ -152,8 +184,6 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
 
       const el = {
         editor: byId<HTMLTextAreaElement>("editor"),
-        title: byId<HTMLInputElement>("title"),
-        author: byId<HTMLInputElement>("author"),
         copy: byId("copy"),
         print: byId("print"),
         clear: byId("clear"),
@@ -192,42 +222,29 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
         },
       };
 
-      // ── URL state ──
+      // ── URL state: the encoded editor text, frontmatter included ──
       const queryParams = {
-        parse: (): Content => {
+        parse: (): string => {
           const params = new URLSearchParams(window.location.search);
           const encodedState = params.get("state");
-          if (!encodedState) return { title: "", author: "", text: "" };
+          if (!encodedState) return "";
           try {
-            const parts = encodedState.split("|");
+            // Older links carry `title|author|text` or `title|text`; fold
+            // those into frontmatter
+            const parts = encodedState.split("|").map(encoding.decode);
             if (parts.length === 3)
-              return {
-                title: encoding.decode(parts[0]),
-                author: encoding.decode(parts[1]),
-                text: encoding.decode(parts[2]),
-              };
+              return withFrontmatter(parts[0], parts[1], parts[2]);
             if (parts.length === 2)
-              return {
-                title: encoding.decode(parts[0]),
-                author: "",
-                text: encoding.decode(parts[1]),
-              };
-            return {
-              title: "",
-              author: "",
-              text: encoding.decode(encodedState),
-            };
+              return withFrontmatter(parts[0], "", parts[1]);
+            return parts[0];
           } catch (e) {
             console.warn("Failed to parse state from URL:", e);
-            return { title: "", author: "", text: "" };
+            return "";
           }
         },
-        create: ({ title, author, text }: Content) =>
-          title || author
-            ? `${encoding.encode(title)}|${encoding.encode(author)}|${encoding.encode(text)}`
-            : encoding.encode(text),
-        updateURL: (content: Content) => {
-          const stateValue = queryParams.create(content);
+        create: (text: string) => encoding.encode(text),
+        updateURL: (text: string) => {
+          const stateValue = queryParams.create(text);
           const params = new URLSearchParams([["state", stateValue]]);
           window.history.replaceState(
             null,
@@ -247,21 +264,39 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
 
       // ── Update functions ──
       function updateState() {
-        state.title = el.title.value.trim();
-        state.author = el.author.value.trim();
         state.text = el.editor.value;
+        const { data, body } = parseFrontmatter(state.text);
+        state.title = data.title ?? "";
+        state.author = data.author ?? "";
+        state.body = body;
       }
 
       function updatePreview() {
-        const html = renderMarkdown(state.text);
-        el.preview.innerHTML =
-          html ||
-          '<p class="preview-placeholder">Preview will appear here…</p>';
+        const html = renderMarkdown(state.body);
+        if (!html && !state.title && !state.author) {
+          el.preview.innerHTML =
+            '<p class="preview-placeholder">Preview will appear here…</p>';
+          return;
+        }
+        el.preview.innerHTML = html;
+        // Show the frontmatter's title and byline, as the printout does
+        if (state.title) {
+          const h = document.createElement("h1");
+          h.className = "preview-title";
+          h.textContent = state.title;
+          el.preview.prepend(h);
+        }
+        if (state.author) {
+          const by = document.createElement("p");
+          by.className = "preview-author";
+          by.textContent = `— ${state.author}`;
+          el.preview.append(by);
+        }
       }
 
       function updatePrintContent() {
         el.contentTitle.textContent = state.title;
-        el.contentBody.innerHTML = renderMarkdown(state.text);
+        el.contentBody.innerHTML = renderMarkdown(state.body);
         el.contentAuthor.textContent = state.author ? `— ${state.author}` : "";
       }
 
@@ -276,7 +311,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
         const displayTitle =
           title.length > 60 ? title.slice(0, 57) + "..." : title;
         // Strip markdown for description snippet
-        const plainText = state.text.replace(/[#*_`>\-[\]!]/g, "").trim();
+        const plainText = state.body.replace(/[#*_`>\-[\]!]/g, "").trim();
         const description =
           plainText.slice(0, 160) ||
           "Create and share beautifully formatted text documents.";
@@ -301,7 +336,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
         updatePrintContent();
         updateDocumentMetadata();
         updateFontStyles();
-        queryParams.updateURL(state);
+        queryParams.updateURL(state.text);
       }
 
       // ── Markdown insertion helpers ──
@@ -411,20 +446,32 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
 
       // ── Main inputs ──
       el.editor.addEventListener("input", updateAll);
-      el.title.addEventListener("input", updateAll);
-      el.author.addEventListener("input", updateAll);
 
       // ── Actions ──
       function requireTitle() {
-        if (el.title.value.trim()) return true;
-        alert("Title is required to share or print.");
-        el.title.focus();
+        if (state.title) return true;
+        // No title yet: add a frontmatter block (or a title line to the
+        // existing one) and select the placeholder so it can be typed over
+        const placeholder = "Title";
+        const ta = el.editor;
+        const hasFrontmatter = FRONTMATTER.test(ta.value);
+        const insert = hasFrontmatter
+          ? `title: ${placeholder}\n`
+          : `---\ntitle: ${placeholder}\n---\n\n`;
+        const at = hasFrontmatter ? ta.value.indexOf("\n") + 1 : 0;
+        ta.setRangeText(insert, at, at);
+        ta.selectionStart = at + insert.indexOf(placeholder);
+        ta.selectionEnd = ta.selectionStart + placeholder.length;
+        el.tabEdit.click();
+        ta.focus();
+        updateAll();
+        alert("Add a title to the frontmatter to share or print.");
         return false;
       }
 
       el.copy.addEventListener("click", () => {
         if (!requireTitle()) return;
-        const stateValue = queryParams.create(state);
+        const stateValue = queryParams.create(state.text);
         const params = new URLSearchParams([["state", stateValue]]);
         const url = `${window.location.origin}${window.location.pathname}?${params}`;
         navigator.clipboard
@@ -433,8 +480,6 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
       });
 
       el.clear.addEventListener("click", () => {
-        el.title.value = "";
-        el.author.value = "";
         el.editor.value = "";
         updateAll();
       });
@@ -459,10 +504,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
       });
 
       // ── Init ──
-      const initial = queryParams.parse();
-      el.title.value = initial.title;
-      el.author.value = initial.author;
-      el.editor.value = initial.text;
+      el.editor.value = queryParams.parse();
       updateAll();
     </script>
   </body>
@@ -539,30 +581,6 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
     gap: 0.75rem;
     align-items: stretch;
     flex-shrink: 0;
-  }
-
-  input[type="text"] {
-    padding: 0.5rem;
-    font-family: system-ui;
-    font-size: 1rem;
-    font-weight: 600;
-    border: 1px solid var(--app-border);
-    border-radius: 6px;
-    background: var(--app-bg);
-    color: var(--app-color);
-  }
-
-  #title {
-    width: 100%;
-  }
-
-  #author {
-    width: 100%;
-  }
-
-  input[type="text"]:focus {
-    outline: none;
-    border-color: var(--app-accent);
   }
 
   select {
@@ -850,6 +868,18 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
     border-radius: 4px;
   }
 
+  /* Title and byline from the frontmatter */
+  #preview .preview-title {
+    margin-bottom: 0.75em;
+  }
+
+  #preview .preview-author {
+    font-size: 0.9em;
+    font-style: italic;
+    margin-top: 2em;
+    color: var(--app-text-secondary);
+  }
+
   /* Empty preview placeholder */
   .preview-placeholder {
     color: var(--app-text-secondary);
@@ -1042,21 +1072,6 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
       flex-wrap: wrap;
       gap: 0.75rem;
       align-items: center;
-    }
-
-    #title {
-      flex: 1;
-      min-width: 200px;
-      width: auto;
-      font-size: 1.25rem;
-      padding: 0.6rem 0.75rem;
-    }
-
-    #author {
-      min-width: 150px;
-      width: auto;
-      font-size: 1.25rem;
-      padding: 0.6rem 0.75rem;
     }
 
     .toolbar-row {
