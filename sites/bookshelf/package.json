@@ -11,7 +11,8 @@
     "deploy:preview": "npx astro build && npx wrangler dev",
     "deploy": "npx astro build && npx wrangler deploy",
     "typecheck": "astro check",
-    "covers": "node scripts/fetch-covers.mjs"
+    "covers": "node scripts/fetch-covers.mjs",
+    "colors": "node scripts/cover-colors.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.2",
@@ -22,6 +23,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "sharp": "^0.34.5",
     "wrangler": "^4.35.0"
   }
 }
