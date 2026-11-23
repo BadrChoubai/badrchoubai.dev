@@ -1,8 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 import Section from "../components/Section.astro";
+import { hasWriteup, isPublished } from "../lib/projects";
 
-const projects = (await getCollection("projects")).sort(
+const projects = (await getCollection("projects", isPublished)).sort(
   (a, b) => a.data.order - b.data.order,
 );
 ---
@@ -12,7 +13,9 @@ const projects = (await getCollection("projects")).sort(
 
   <ul class="projects" role="list">
     {
-      projects.map(({ data }) => (
+      projects.map((project) => {
+        const { data } = project;
+        return (
         <li class="project">
           <h3 class="project__title">{data.title}</h3>
           <p class="project__desc">{data.description}</p>
@@ -22,14 +25,24 @@ const projects = (await getCollection("projects")).sort(
             ))}
           </ul>
           <div class="project__links">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={data.repo}
-              aria-label={`${data.title} source code on GitHub`}
-            >
-              source
-            </a>
+            {hasWriteup(project) && (
+              <a
+                href={`/projects/${project.id}/`}
+                aria-label={`${data.title} write-up`}
+              >
+                write-up
+              </a>
+            )}
+            {data.repo && (
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={data.repo}
+                aria-label={`${data.title} source code on GitHub`}
+              >
+                source
+              </a>
+            )}
             {data.live && (
               <a
                 target="_blank"
@@ -42,7 +55,8 @@ const projects = (await getCollection("projects")).sort(
             )}
           </div>
         </li>
-      ))
+        );
+      })
     }
   </ul>
 </Section>

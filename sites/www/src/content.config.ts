@@ -8,8 +8,10 @@ const projects = defineCollection({
     title: z.string(),
     description: z.string(),
     stack: z.array(z.string()),
-    repo: z.url(),
+    repo: z.url().optional(),
     live: z.url().optional(),
+    // Drafts show in `astro dev` but are left out of production builds
+    draft: z.boolean().default(false),
     // Lower numbers show first
     order: z.number().default(100),
   }),
