@@ -1,0 +1,56 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Section from "../components/Section.astro";
+import { Content, frontmatter } from "../content/now.md";
+import "../styles/writeup.css";
+
+// A "now page" (https://nownownow.com/about): what I'm focused on at the moment
+const updated = new Date(frontmatter.updated);
+if (Number.isNaN(updated.getTime())) {
+  throw new Error("src/content/now.md needs an `updated: YYYY-MM-DD` date");
+}
+const updatedLabel = updated.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+---
+
+<Layout title="Now" description="What I'm focused on at the moment.">
+  <Section class="section" id="now">
+    <article class="writeup">
+      <a class="writeup__back" href="/">&larr; Home</a>
+      <header class="writeup__header">
+        <h1>Now</h1>
+        <p class="writeup__desc">What I'm focused on at the moment.</p>
+        <p class="writeup__links">
+          Last updated <time datetime={updated.toISOString().slice(0, 10)}
+            >{updatedLabel}</time
+          >
+        </p>
+      </header>
+      <div class="writeup__body">
+        <Content />
+        <p class="now__about">
+          This is a <a href="https://nownownow.com/about">now page</a>, an idea
+          from Derek Sivers.
+        </p>
+      </div>
+    </article>
+  </Section>
+</Layout>
+
+<style>
+  .writeup__links {
+    margin: 0;
+  }
+
+  .now__about {
+    margin-top: calc(var(--app-spacing) * 2);
+    padding-top: var(--app-spacing);
+    border-top: var(--app-rule-width) solid var(--app-rule-color);
+    font-size: 0.875em;
+    opacity: 0.75;
+  }
+</style>
