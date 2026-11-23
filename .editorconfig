@@ -1,0 +1,15 @@
+# Matches Prettier's defaults, so editors that don't run Prettier on save
+# still indent the same way
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Trailing spaces are a line break in Markdown
+[*.md]
+trim_trailing_whitespace = false

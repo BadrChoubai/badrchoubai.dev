@@ -276,7 +276,7 @@ const ogImage = new URL("/PrettyPrinter.png", Astro.site).href;
         const displayTitle =
           title.length > 60 ? title.slice(0, 57) + "..." : title;
         // Strip markdown for description snippet
-        const plainText = state.text.replace(/[#*_`>\-\[\]!]/g, "").trim();
+        const plainText = state.text.replace(/[#*_`>\-[\]!]/g, "").trim();
         const description =
           plainText.slice(0, 160) ||
           "Create and share beautifully formatted text documents.";

@@ -25,6 +25,19 @@ directly, so edits there hot-reload in whichever site is running.
 
 The site-wide menu lives in `packages/ui/src/links.ts`.
 
+## Check
+
+```sh
+npm run format                       # Prettier: rewrite every file
+npm run format:check                 # Prettier: report, don't write
+npm run lint                         # ESLint: code problems, not style
+npm run typecheck                    # astro check in every site
+```
+
+A pre-commit hook runs ESLint and Prettier on staged files (set up by
+`npm install`). Prettier owns formatting; `.editorconfig` matches it for
+editors that don't run Prettier on save.
+
 ## Deploy
 
 Each site is its own Cloudflare Worker, connected to this repo through

@@ -13,11 +13,30 @@
     "dev:bookshelf": "npm run dev -w sites/bookshelf",
     "dev:pretty-printer": "npm run dev -w sites/pretty-printer",
     "build": "npm run build --workspaces --if-present",
-    "lint": "prettier . --write"
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "prepare": "husky || true"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "concurrently": "10.0.6",
+    "eslint": "10.15.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-astro": "3.2.1",
+    "globals": "17.14.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.2",
     "prettier": "3.8.1",
-    "prettier-plugin-astro": "0.14.1"
+    "prettier-plugin-astro": "0.14.1",
+    "typescript-eslint": "8.73.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs,ts,astro}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,jsonc,md,css,yml,yaml,html}": "prettier --write"
   }
 }
