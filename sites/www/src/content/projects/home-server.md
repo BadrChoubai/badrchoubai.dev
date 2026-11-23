@@ -2,9 +2,8 @@
 title: Home Server
 description: A Framework laptop mainboard running headless as a home server, reachable over Tailscale.
 stack: [Framework Mainboard, Fedora, Tailscale, SSH, Alacritty]
-# repo: add one if the config lives on GitHub
 order: 5
-draft: true
+draft: false
 ---
 
 ## Why
