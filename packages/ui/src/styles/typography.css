@@ -76,6 +76,8 @@ blockquote {
 
 /* =========================================================
    Headings — Host Grotesk for display character
+   Its weight axis stops at 800, and no heading is lighter than body
+   text: h1–h3 get size and weight, h4–h6 lean on weight at 600
    ========================================================= */
 h1,
 h2,
@@ -99,7 +101,7 @@ h6 {
 
 h1 {
   --app-font-size: 2rem;
-  --app-font-weight: 900;
+  --app-font-weight: 800;
   --app-line-height: 1.125;
   --app-typography-spacing-top: 3rem;
   font-size: var(--app-font-size);
@@ -119,7 +121,7 @@ h2 {
 
 h3 {
   --app-font-size: 1.5rem;
-  --app-font-weight: 500;
+  --app-font-weight: 700;
   --app-line-height: 1.175;
   --app-typography-spacing-top: 2.25rem;
   font-size: var(--app-font-size);
@@ -129,7 +131,7 @@ h3 {
 
 h4 {
   --app-font-size: 1.25rem;
-  --app-font-weight: 400;
+  --app-font-weight: 600;
   --app-line-height: 1.2;
   --app-typography-spacing-top: 1.875rem;
   font-size: var(--app-font-size);
@@ -139,7 +141,7 @@ h4 {
 
 h5 {
   --app-font-size: 1.125rem;
-  --app-font-weight: 300;
+  --app-font-weight: 600;
   --app-line-height: 1.225;
   --app-typography-spacing-top: 1.6875rem;
   font-size: var(--app-font-size);
@@ -149,7 +151,7 @@ h5 {
 
 h6 {
   --app-font-size: 1rem;
-  --app-font-weight: 300;
+  --app-font-weight: 600;
   --app-line-height: 1.25;
   --app-typography-spacing-top: 1.5rem;
   font-size: var(--app-font-size);
