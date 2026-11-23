@@ -3,7 +3,7 @@ title: Thinking in Systems
 author: Donella H. Meadows
 genre: "Science & Technology"
 cover: ../../assets/covers/thinking-in-systems.jpg
-color: "#d96c4d"
+color: "#dd694b"
 ---
 
 **“You think because you understand 'one' you must also understand 'two', because one and one make two. But you must also understand 'and'.”**

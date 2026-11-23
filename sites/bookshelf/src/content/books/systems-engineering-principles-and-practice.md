@@ -4,7 +4,7 @@ author: "Alexander Kossiakoff, William N. Sweet, Samuel J. Seymour & Steven M. B
 authorSort: "Kossiakoff, Alexander"
 genre: "Science & Technology"
 cover: ../../assets/covers/systems-engineering-principles-and-practice.jpg
-color: "#5b93c9"
+color: "#7a86d5"
 ---
 
 ## Chapter One: Systems Engineering and The World of Modern Systems

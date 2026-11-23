@@ -3,7 +3,7 @@ title: "Unit Testing: Principles, Practices, and Patterns"
 author: Vladimir Khorikov
 genre: "Science & Technology"
 cover: ../../assets/covers/unit-testing.jpg
-color: "#c9a07a"
+color: "#699758"
 ---
 
 ## The Goal of Unit Testing: Sustainability and Scalability

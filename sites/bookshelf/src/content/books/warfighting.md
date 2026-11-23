@@ -4,7 +4,7 @@ author: U.S. Marine Corps
 authorSort: "United States Marine Corps"
 genre: Philosophy
 cover: ../../assets/covers/warfighting.jpg
-color: "#9aa45a"
+color: "#648ec0"
 ---
 
 ## Summary

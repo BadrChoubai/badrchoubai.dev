@@ -3,7 +3,7 @@ title: The Case Against Education
 author: Bryan Caplan
 genre: "Society & Politics"
 cover: ../../assets/covers/the-case-against-education.jpg
-color: "#6f9fd8"
+color: "#b1a78b"
 ---
 
 ## Chapter One: The Magic of Education

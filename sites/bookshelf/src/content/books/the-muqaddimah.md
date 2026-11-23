@@ -4,5 +4,5 @@ author: Ibn Khaldūn
 authorSort: Ibn Khaldūn
 genre: "Society & Politics"
 cover: ../../assets/covers/the-muqaddimah.jpg
-color: "#b97e58"
+color: "#bb7d5b"
 ---

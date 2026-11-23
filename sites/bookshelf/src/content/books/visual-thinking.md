@@ -3,5 +3,5 @@ title: Visual Thinking
 author: Temple Grandin
 genre: Psychology
 cover: ../../assets/covers/visual-thinking.jpg
-color: "#7fb06a"
+color: "#be6cca"
 ---

@@ -3,7 +3,7 @@ title: Principles
 author: Ray Dalio
 genre: "Business & Finance"
 cover: ../../assets/covers/principles.jpg
-color: "#db6868"
+color: "#8b8b8b"
 ---
 
 ## Chapter One: Embrace Reality and Deal with it

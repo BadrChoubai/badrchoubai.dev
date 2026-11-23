@@ -3,7 +3,7 @@ title: "Release It!"
 author: Michael T. Nygard
 genre: "Science & Technology"
 cover: ../../assets/covers/release-it.jpg
-color: "#7f8fc8"
+color: "#93a7c3"
 ---
 
 **How this book is organized?**

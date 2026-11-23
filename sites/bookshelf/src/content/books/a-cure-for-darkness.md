@@ -3,5 +3,5 @@ title: A Cure for Darkness
 author: Alex Riley
 genre: Psychology
 cover: ../../assets/covers/a-cure-for-darkness.jpg
-color: "#ca7644"
+color: "#c6784d"
 ---

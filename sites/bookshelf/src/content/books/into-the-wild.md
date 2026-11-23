@@ -3,5 +3,5 @@ title: Into the Wild
 author: Jon Krakauer
 genre: "Memoir & Adventure"
 cover: ../../assets/covers/into-the-wild.jpg
-color: "#6b89d7"
+color: "#7cb1b4"
 ---
